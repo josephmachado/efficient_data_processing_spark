@@ -6,6 +6,12 @@ USER root
 COPY ./containers/spark/requirements.txt ./
 RUN pip install -r requirements.txt
 
+# Copy SQL DDL and DML to SPARK_HOME dir
+COPY ./containers/spark/setup.sql ./
+
+# Copy tpch data generator into the container
+COPY ./containers/spark/tpch-dbgen ./tpch-dbgen/
+
 # Create the log file to be able to run tail
 RUN touch /var/log/cron.log
 

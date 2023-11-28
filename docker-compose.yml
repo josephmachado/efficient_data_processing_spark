@@ -16,8 +16,6 @@ services:
       METADATA_DATABASE: metadatadb
     hostname:
       localhost
-    volumes:
-      - ./adventureworks:/opt/spark/work-dir/adventureworks
     ports:
       - "4040:4040"
 
