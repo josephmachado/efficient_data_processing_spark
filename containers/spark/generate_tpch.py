@@ -1,7 +1,6 @@
 from jinja2 import Template
-# 1. Generate tpch data
-# 2. Generate DDL and DML query for creating and loading data into TPCH
-# 3. Run DDL and DML query from step 2 in spark-sql
+# Generate DDL and DML query for creating and loading data into TPCH
+# Generate count(*) queries for all the tables to check load
 
 TABLE_SCHEMAS = {
     'customer': {
@@ -88,7 +87,7 @@ TABLE_SCHEMAS = {
     }
 }
 
-def create_tables(tbl_schemas=TABLE_SCHEMAS):
+def create_ddl_dml_queries(tbl_schemas=TABLE_SCHEMAS):
     sql_template = Template("""
     DROP TABLE IF EXISTS {{ table_name }}; 
     
@@ -107,5 +106,12 @@ def create_tables(tbl_schemas=TABLE_SCHEMAS):
         for table_name, column_name_type in tbl_schemas.items():
             f.write(sql_template.render(table_name=table_name,columns=column_name_type))
 
+
+def create_count_queries(tables):
+    with open("count.sql", 'w+') as f:
+        f.writelines([f'SELECT COUNT(*) FROM {table}; \n' for table in tables])
+
+
 if __name__ == '__main__':
-    create_tables()
+    create_ddl_dml_queries()
+    create_count_queries(TABLE_SCHEMAS.keys())

@@ -8,6 +8,7 @@ RUN pip install -r requirements.txt
 
 # Copy SQL DDL and DML to SPARK_HOME dir
 COPY ./containers/spark/setup.sql ./
+COPY ./containers/spark/count.sql ./
 
 # Copy tpch data generator into the container
 COPY ./containers/spark/tpch-dbgen ./tpch-dbgen/
