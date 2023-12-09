@@ -14,8 +14,7 @@ services:
       METADATA_USERNAME: sdeuser
       METADATA_PASSWORD: sdepassword
       METADATA_DATABASE: metadatadb
-    hostname:
-      localhost
+    hostname: localhost
     ports:
       - "4040:4040"
 

@@ -8,9 +8,11 @@
 - create and count sql to docker container 
 - tpch-dbgen
  
+## Data model
+
 ## Running queries
 
-## Data model
+- make spark sql
 
 ## Stopping containers
 

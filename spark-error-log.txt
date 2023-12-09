@@ -1,0 +1,3 @@
+1. 7-3.sql on joins: WARN LazyStruct: Extra bytes detected at the end of the row! Ignoring similar problems.
+2. 7-3.sql ERROR CodeGenerator: failed to compile: org.codehaus.commons.compiler.CompileException: File 'generated.java', Line 120, Colum
+n 9: Redefinition of local variable "smj_isNull_7"

@@ -1,5 +1,5 @@
-FROM deltaio/delta-docker:0.8.1_2.3.0
-# https://github.com/delta-io/delta-docs/blob/main/static/quickstart_docker/0.8.1_2.3.0/Dockerfile
+FROM deltaio/delta-docker:latest
+# latest is at 1.0.0_3.0.0, 
 
 USER root
 
