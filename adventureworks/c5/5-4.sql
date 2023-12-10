@@ -3,7 +3,7 @@ USE tpch;
 SELECT
     custkey,
     orderdate,
-    format('%,.2f', totalprice) AS totalprice,
+    format_number(totalprice, 2) AS totalprice,
     RANK() OVER(
         PARTITION BY custkey
         ORDER BY
@@ -16,8 +16,6 @@ ORDER BY
     rnk
 LIMIT
     15;
-
-;
 
 SELECT
     orderkey,

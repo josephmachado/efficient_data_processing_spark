@@ -1,3 +1,14 @@
 1. 7-3.sql on joins: WARN LazyStruct: Extra bytes detected at the end of the row! Ignoring similar problems.
 2. 7-3.sql ERROR CodeGenerator: failed to compile: org.codehaus.commons.compiler.CompileException: File 'generated.java', Line 120, Colum
 n 9: Redefinition of local variable "smj_isNull_7"
+3. WARN HiveMetaStore: Location: file:/opt/spark/work-dir/spark-warehouse/tpch.db/part specified for non-external table:part
+4.  WARN SessionState: METASTORE_FILTER_HOOK will be ignored, since hive.security.authorization.manager is set to instance of HiveAuthorizerFactory.
+5. 23/12/09 16:20:23 WARN WindowExec: No Partition Defined for Window operation! Moving all data to a single partition, this can cause serious performance degradation.
+6. [657.907s][warning][gc,alloc] Executor task launch worker for task 1.0 in stage 34.0 (TID 96): Retried waiting for GCLocker too often allocating
+ 8388610 words
+23/12/09 16:33:11 WARN TaskMemoryManager: Failed to allocate a page (67108864 bytes), try again.
+23/12/09 16:33:11 WARN RowBasedKeyValueBatch: Calling spill() on RowBasedKeyValueBatch. Will not spill but return 0.
+7. proper data types for tpch tables.   
+8. 23/12/10 01:42:12 WARN AbstractS3ACommitterFactory: Using standard FileOutputCommitter to commit work. This is slow and potentially unsafe.
+9. 23/12/10 01:45:45 WARN package: Truncated the string representation of a plan since it was too large. This behavior can be adjusted by setting 'spark.sql.debug.maxToStringFields'.
+23/12/10 01:45:51 WARN HiveExternalCatalog: Couldn't find corresponding Hive SerDe for data source provider delta. Persisting data source table `minio`.`lineitem_w_encoding_w_partitioning` into Hive metastore in Spark SQL specific format, which is NOT compatible with Hive.

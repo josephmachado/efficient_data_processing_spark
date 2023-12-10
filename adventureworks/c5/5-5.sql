@@ -10,7 +10,7 @@ SELECT
 FROM
     (
         SELECT
-            date_format(orderdate, '%Y-%m') AS ordermonth,
+            date_format(orderdate, '%y-%M') AS ordermonth,
             ROUND(SUM(totalprice) / 100000, 2) AS total_price -- divide by 100,000 for readability
         FROM
             orders
@@ -19,8 +19,6 @@ FROM
     )
 LIMIT
     10;
-
-;
 
 SELECT
     ordermonth,
@@ -36,7 +34,7 @@ SELECT
 FROM
     (
         SELECT
-            date_format(orderdate, '%Y-%m') AS ordermonth,
+            date_format(orderdate, '%y-%M') AS ordermonth,
             ROUND(SUM(totalprice) / 100000, 2) AS total_price -- divide by 100,000 for readability
         FROM
             orders
@@ -45,8 +43,6 @@ FROM
     )
 LIMIT
     24;
-
-;
 
 SELECT
     customer_name,
@@ -86,7 +82,9 @@ FROM
     )
 ORDER BY
     customer_name,
-    order_date;
+    order_date
+LIMIT
+    25;
 
 SELECT
     customer_name,

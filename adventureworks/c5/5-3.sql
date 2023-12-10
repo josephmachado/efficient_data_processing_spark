@@ -46,7 +46,7 @@ GROUP BY
     n.name,
     year(o.orderdate)
 ORDER BY
-    n.name,
-    year(o.orderdate)
+    nation_name,
+    order_year
 LIMIT
     20;

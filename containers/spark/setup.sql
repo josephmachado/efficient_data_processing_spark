@@ -30,9 +30,9 @@ CREATE TABLE lineitem (
     tax Double,
     returnflag STRING,
     linestatus STRING,
-    shipdate STRING,
-    commitdate STRING,
-    receiptdate STRING,
+    shipdate DATE,
+    commitdate DATE,
+    receiptdate DATE,
     shipinstruct STRING,
     shipmode STRING,
     COMMENT STRING

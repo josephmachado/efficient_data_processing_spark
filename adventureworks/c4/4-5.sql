@@ -1,11 +1,13 @@
-DROP SCHEMA IF EXISTS minio.tpch;
+DROP SCHEMA IF EXISTS minio;
 
-CREATE SCHEMA minio.tpch WITH (location = 's3a:/tiny/tpch/');
+CREATE SCHEMA minio;
+
+USE minio;
 
 -- tpch is a bucket in minio, precreated for you with your docker container
-DROP TABLE IF EXISTS minio.tpch.lineitem_wo_encoding;
+DROP TABLE IF EXISTS lineitem_wo_encoding;
 
-CREATE TABLE minio.tpch.lineitem_wo_encoding (
+CREATE TABLE lineitem_wo_encoding (
     orderkey bigint,
     partkey bigint,
     suppkey bigint,
@@ -22,16 +24,10 @@ CREATE TABLE minio.tpch.lineitem_wo_encoding (
     returnflag varchar(1),
     shipdate date,
     receiptdate date
-) WITH (
-    external_location = 's3a://tpch/lineitem_wo_encoding/',
-    format = 'TEXTFILE'
-);
-
--- we had to specify TEXTFILE as the format since the default is ORC (a columnar format)
-USE tpch.sf1;
+) LOCATION 's3a://tpch/lineitem_wo_encoding/';
 
 INSERT INTO
-    minio.tpch.lineitem_wo_encoding
+    minio.lineitem_wo_encoding
 SELECT
     orderkey,
     partkey,
@@ -50,11 +46,11 @@ SELECT
     shipdate,
     receiptdate
 FROM
-    lineitem;
+    minio.lineitem;
 
-DROP TABLE IF EXISTS minio.tpch.lineitem_w_encoding;
+DROP TABLE IF EXISTS lineitem_w_encoding;
 
-CREATE TABLE minio.tpch.lineitem_w_encoding (
+CREATE TABLE lineitem_w_encoding (
     orderkey bigint,
     partkey bigint,
     suppkey bigint,
@@ -77,7 +73,7 @@ CREATE TABLE minio.tpch.lineitem_w_encoding (
 );
 
 INSERT INTO
-    minio.tpch.lineitem_w_encoding
+    lineitem_w_encoding
 SELECT
     orderkey,
     partkey,
@@ -96,13 +92,13 @@ SELECT
     shipdate,
     receiptdate
 FROM
-    lineitem;
+    tpch.lineitem;
 
 SELECT
     suppkey,
     sum(quantity) AS total_qty
 FROM
-    minio.tpch.lineitem_w_encoding
+    lineitem_w_encoding
 GROUP BY
     suppkey;
 
@@ -111,7 +107,7 @@ SELECT
     suppkey,
     sum(quantity) AS total_qty
 FROM
-    minio.tpch.lineitem_wo_encoding
+    lineitem_wo_encoding
 GROUP BY
     suppkey;
 
@@ -132,13 +128,13 @@ SELECT
     custkey,
     sum(totalprice) AS total_cust_price
 FROM
-    minio.tpch.orders_w_encoding -- & minio.tpch.orders_wo_encoding
+    orders_w_encoding -- & orders_wo_encoding
 GROUP BY
     1;
 
-DROP TABLE IF EXISTS minio.tpch.lineitem_w_encoding_w_partitioning;
+DROP TABLE IF EXISTS lineitem_w_encoding_w_partitioning;
 
-CREATE TABLE minio.tpch.lineitem_w_encoding_w_partitioning (
+CREATE TABLE lineitem_w_encoding_w_partitioning (
     orderkey bigint,
     partkey bigint,
     suppkey bigint,
@@ -156,16 +152,10 @@ CREATE TABLE minio.tpch.lineitem_w_encoding_w_partitioning (
     shipdate date,
     receiptdate date,
     receiptyear varchar(4)
-) WITH (
-    external_location = 's3a://tpch/lineitem_w_encoding_w_partitioning/',
-    partitioned_by = ARRAY ['receiptyear'],
-    format = 'PARQUET'
-);
-
-USE tpch.tiny;
+) USING DELTA LOCATION 's3a://tpch/lineitem_w_encoding_w_partitioning/';
 
 INSERT INTO
-    minio.tpch.lineitem_w_encoding_w_partitioning
+    lineitem_w_encoding_w_partitioning
 SELECT
     orderkey,
     partkey,
@@ -185,7 +175,7 @@ SELECT
     receiptdate,
     cast(year(receiptdate) AS varchar(4)) AS receiptyear
 FROM
-    lineitem;
+    tpch.lineitem;
 
 -- run 'make metadata-db' or
 -- 'docker exec -ti mariadb /usr/bin/mariadb -padmin'
@@ -213,13 +203,13 @@ EXPLAIN ANALYZE
 SELECT
     *
 FROM
-    minio.tpch.lineitem_w_encoding_w_partitioning
+    lineitem_w_encoding_w_partitioning
 WHERE
     receiptyear = '1994';
 
-DROP TABLE IF EXISTS minio.tpch.lineitem_w_encoding_w_bucketing;
+DROP TABLE IF EXISTS lineitem_w_encoding_w_bucketing;
 
-CREATE TABLE minio.tpch.lineitem_w_encoding_w_bucketing (
+CREATE TABLE lineitem_w_encoding_w_bucketing (
     orderkey bigint,
     partkey bigint,
     suppkey bigint,
@@ -246,7 +236,7 @@ CREATE TABLE minio.tpch.lineitem_w_encoding_w_bucketing (
 USE tpch.tiny;
 
 INSERT INTO
-    minio.tpch.lineitem_w_encoding_w_bucketing
+    lineitem_w_encoding_w_bucketing
 SELECT
     orderkey,
     partkey,
@@ -281,15 +271,15 @@ EXPLAIN ANALYZE
 SELECT
     *
 FROM
-    minio.tpch.lineitem_w_encoding_w_bucketing
+    lineitem_w_encoding_w_bucketing
 WHERE
     quantity >= 30
     AND quantity <= 45;
 
 -- Input: 21,550 rows (3.14MB), Filtered: 11.03%
-DROP TABLE IF EXISTS minio.tpch.lineitem_w_encoding_w_bucketing_eg;
+DROP TABLE IF EXISTS lineitem_w_encoding_w_bucketing_eg;
 
-CREATE TABLE minio.tpch.lineitem_w_encoding_w_bucketing_eg (
+CREATE TABLE lineitem_w_encoding_w_bucketing_eg (
     orderkey bigint,
     partkey bigint,
     suppkey bigint,
@@ -316,7 +306,7 @@ CREATE TABLE minio.tpch.lineitem_w_encoding_w_bucketing_eg (
 USE tpch.tiny;
 
 INSERT INTO
-    minio.tpch.lineitem_w_encoding_w_bucketing_eg
+    lineitem_w_encoding_w_bucketing_eg
 SELECT
     orderkey,
     partkey,
@@ -341,7 +331,7 @@ EXPLAIN ANALYZE
 SELECT
     *
 FROM
-    minio.tpch.lineitem_w_encoding_w_bucketing_eg
+    lineitem_w_encoding_w_bucketing_eg
 WHERE
     quantity >= 30
     AND quantity <= 45;
