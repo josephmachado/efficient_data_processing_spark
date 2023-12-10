@@ -24,7 +24,7 @@ CREATE TABLE lineitem_wo_encoding (
     returnflag varchar(1),
     shipdate date,
     receiptdate date
-) LOCATION 's3a://tpch/lineitem_wo_encoding/';
+) USING CSV LOCATION 's3a://tpch/lineitem_wo_encoding/';
 
 INSERT INTO
     minio.lineitem_wo_encoding
@@ -46,7 +46,7 @@ SELECT
     shipdate,
     receiptdate
 FROM
-    minio.lineitem;
+    tpch.lineitem;
 
 DROP TABLE IF EXISTS lineitem_w_encoding;
 
@@ -67,10 +67,7 @@ CREATE TABLE lineitem_w_encoding (
     returnflag varchar(1),
     shipdate date,
     receiptdate date
-) WITH (
-    external_location = 's3a://tpch/lineitem_w_encoding/',
-    format = 'PARQUET'
-);
+) USING parquet LOCATION 's3a://tpch/lineitem_w_encoding/';
 
 INSERT INTO
     lineitem_w_encoding
@@ -94,6 +91,7 @@ SELECT
 FROM
     tpch.lineitem;
 
+-- Time taken: 3.655 seconds, Fetched 10000 row(s)
 SELECT
     suppkey,
     sum(quantity) AS total_qty
@@ -102,7 +100,7 @@ FROM
 GROUP BY
     suppkey;
 
--- 2.22 [6M rows, 14.5MB] [2.7M rows/s, 6.54MB/s]
+-- Time taken: 11.924 seconds, Fetched 10001 row(s) 
 SELECT
     suppkey,
     sum(quantity) AS total_qty
@@ -111,19 +109,18 @@ FROM
 GROUP BY
     suppkey;
 
--- 10.98 [6M rows, 215MB] [547K rows/s, 19.6MB/s]
-USE tpch.tiny;
-
+-- Time taken: 5.374 seconds, Fetched 10000 row(s)
 SELECT
     suppkey,
     sum(quantity) AS total_qty
 FROM
-    lineitem
+    tpch.lineitem
 GROUP BY
     suppkey
 ORDER BY
     2 DESC;
 
+-- Do the same for orders tables   
 SELECT
     custkey,
     sum(totalprice) AS total_cust_price
@@ -152,7 +149,7 @@ CREATE TABLE lineitem_w_encoding_w_partitioning (
     shipdate date,
     receiptdate date,
     receiptyear varchar(4)
-) USING DELTA LOCATION 's3a://tpch/lineitem_w_encoding_w_partitioning/';
+) USING parquet PARTITIONED BY (receiptyear) LOCATION 's3a://tpch/lineitem_w_encoding_w_partitioning/';
 
 INSERT INTO
     lineitem_w_encoding_w_partitioning
@@ -177,29 +174,17 @@ SELECT
 FROM
     tpch.lineitem;
 
--- run 'make metadata-db' or
--- 'docker exec -ti mariadb /usr/bin/mariadb -padmin'
--- on you terminal
+-- Will result in a full scan
+EXPLAIN
 SELECT
     *
 FROM
-    metastore_db.PARTITIONS;
-
-exit;
-
--- To get the inputs, look for
--- Estimates: {rows: <input_rows> in
--- the query plan
-EXPLAIN ANALYZE
-SELECT
-    *
-FROM
-    tpch.tiny.lineitem
+    tpch.lineitem
 WHERE
     year(receiptdate) = 1994;
 
--- Input: 60175 rows
-EXPLAIN ANALYZE
+-- Will result in a partition lookup
+EXPLAIN EXTENDED
 SELECT
     *
 FROM
@@ -226,14 +211,7 @@ CREATE TABLE lineitem_w_encoding_w_bucketing (
     returnflag varchar(1),
     shipdate date,
     receiptdate date
-) WITH (
-    external_location = 's3a://tpch/lineitem_w_encoding_w_bucketing/',
-    format = 'PARQUET',
-    bucket_count = 75,
-    bucketed_by = ARRAY ['quantity']
-);
-
-USE tpch.tiny;
+) USING parquet CLUSTERED BY (quantity) INTO 75 BUCKETS LOCATION 's3a://tpch/lineitem_w_encoding_w_bucketing/';
 
 INSERT INTO
     lineitem_w_encoding_w_bucketing
@@ -255,19 +233,18 @@ SELECT
     shipdate,
     receiptdate
 FROM
-    lineitem;
+    tpch.lineitem;
 
-EXPLAIN ANALYZE
+EXPLAIN
 SELECT
     *
 FROM
-    lineitem
+    tpch.lineitem
 WHERE
     quantity >= 30
     AND quantity <= 45;
 
--- Input: 60,175 rows (0B), Filtered: 68.14%
-EXPLAIN ANALYZE
+EXPLAIN
 SELECT
     *
 FROM
@@ -276,7 +253,6 @@ WHERE
     quantity >= 30
     AND quantity <= 45;
 
--- Input: 21,550 rows (3.14MB), Filtered: 11.03%
 DROP TABLE IF EXISTS lineitem_w_encoding_w_bucketing_eg;
 
 CREATE TABLE lineitem_w_encoding_w_bucketing_eg (
@@ -296,14 +272,7 @@ CREATE TABLE lineitem_w_encoding_w_bucketing_eg (
     returnflag varchar(1),
     shipdate date,
     receiptdate date
-) WITH (
-    external_location = 's3a://tpch/lineitem_w_encoding_w_bucketing_eg/',
-    format = 'PARQUET',
-    bucket_count = 100,
-    bucketed_by = ARRAY ['quantity']
-);
-
-USE tpch.tiny;
+) USING parquet CLUSTERED BY (quantity) INTO 100 BUCKETS;
 
 INSERT INTO
     lineitem_w_encoding_w_bucketing_eg
@@ -325,9 +294,9 @@ SELECT
     shipdate,
     receiptdate
 FROM
-    lineitem;
+    tpch.lineitem;
 
-EXPLAIN ANALYZE
+EXPLAIN
 SELECT
     *
 FROM
