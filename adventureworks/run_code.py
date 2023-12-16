@@ -8,24 +8,28 @@ from pyspark.sql.types import (
     TimestampType,
 )
 
-from pysparkcode.c2 import run_exercise as c2_run_exercise
+from pysparkcode import c2, c3, c4
 
 def run_spark_sql_code(section: str, spark: SparkSession):
         pass
 
-def run_pyspark_code(section: str, spark: SparkSession):
+def run_pyspark_code(section: int, spark: SparkSession, exercise_num: int = 0):
     print('=================================')
     print('Running Pyspark Code')
     print('=================================')
-    #
-    if section == 2:
-        c2_run_exercise(spark)
+    section_code_map = {
+        2: c2.CodeRunner(),
+        3: c3.CodeRunner(),   
+        4: c4.CodeRunner()
+    } 
+    code_runner = section_code_map[section] 
+    code_runner.run_exercise(spark, exercise_num)
 
-def run_book_code(section: str, spark: SparkSession, runner: str = 'pyspark'):
+def run_book_code(section: str, spark: SparkSession, exercise_num: int = 0, runner: str = 'pyspark'):
     if runner == 'pyspark':
-        run_pyspark_code(section, spark)
+        run_pyspark_code(section, spark, exercise_num)
     else:
-        run_spark_sql_code(section)
+        run_spark_sql_code(section, spark, exercise_num)
 
 if __name__ == '__main__':
     # Create a spark session
@@ -38,4 +42,4 @@ if __name__ == '__main__':
         .getOrCreate()
     )
     spark.sparkContext.setLogLevel("ERROR")
-    run_book_code(section=2, spark=spark)
+    run_book_code(section=4, spark=spark, exercise_num=5)
