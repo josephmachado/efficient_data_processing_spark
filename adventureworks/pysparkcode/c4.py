@@ -1,6 +1,8 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import round, sum, col, count, date_add, lit, year
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DoubleType, LongType, DateType
+import time 
+
 
 class CodeRunner:
     
@@ -140,7 +142,7 @@ class CodeRunner:
         print('Read your query plan & optimize it')
         print('=================================')
         print("Creating schema minio")
-        spark.sql("DROP SCHEMA IF EXISTS minio")
+        spark.sql("DROP SCHEMA IF EXISTS minio CASCADE")
         spark.sql("CREATE SCHEMA minio")
         spark.sql("USE minio")
 
@@ -165,12 +167,75 @@ class CodeRunner:
             StructField("commitdate", DateType(), True),
             StructField("linestatus", StringType(), True),
             StructField("returnflag", StringType(), True),
-            StructField("shipdate", DateType(), True),
-            StructField("receiptdate", DateType(), True)
+            StructField("shipdate", StringType(), True),
+            StructField("receiptdate", StringType(), True)
         ])
 
         spark.catalog.createTable("lineitem_wo_encoding", schema=schema, source="csv", path="s3a://tpch/lineitem_wo_encoding/")
 
+        print("Write data from tpch.lineitem into minio.lineitem_wo_encoding")
+        tpch_lineitem = spark.table("tpch.lineitem")
+        tpch_lineitem.write.mode("overwrite").insertInto("minio.lineitem_wo_encoding", overwrite=True)
+
+        spark.catalog.createTable("lineitem_w_encoding", schema=schema, source="parquet", path="s3a://tpch/lineitem_w_encoding/")
+
+        print("Write data from tpch.lineitem into minio.lineitem_w_encoding")
+        tpch_lineitem.write.mode("overwrite").insertInto("minio.lineitem_w_encoding", overwrite=True)
+       
+        print("Compare query speed of non encoded v encoded lineitem")
+        
+        lineitem_wo_encoding = spark.table("minio.lineitem_wo_encoding")  
+        result_df = (
+            lineitem_wo_encoding
+            .groupBy("suppkey")
+            .agg(sum("quantity").alias("total_qty"))
+        )
+        action_start_time = time.time()
+        result_df.collect()
+        action_end_time = time.time()
+
+        # Calculate and print the execution time for the action
+        exec_time_wo_encoding = action_end_time - action_start_time
+
+        # Show the result
+        print(f"Query execution speed without encoding: {exec_time_wo_encoding} seconds")
+        
+        lineitem_w_encoding = spark.table("minio.lineitem_w_encoding")  
+        result_df = (
+            lineitem_w_encoding
+            .groupBy("suppkey")
+            .agg(sum("quantity").alias("total_qty"))
+        )
+        action_start_time = time.time()
+        result_df.collect()
+        action_end_time = time.time()
+
+        # Calculate and print the execution time for the action
+        exec_time_w_encoding = action_end_time - action_start_time
+
+        # Show the result
+        print(f"Query execution speed with encoding: {exec_time_w_encoding} seconds")
+
+
+        print("Write data from tpch.lineitem into minio.lineitem_w_encoding_w_parititioning")
+
+        tpch_lineitem.withColumn("receiptyear", year(col("receiptdate"))).write.mode("overwrite").partitionBy("receiptyear").format("parquet").saveAsTable("minio.lineitem_w_encoding_w_partitioning", overwrite=True)
+
+        lineitem_w_encoding_w_partitioning = spark.table("minio.lineitem_w_encoding_w_partitioning")  
+        result_df = (
+            lineitem_w_encoding_w_partitioning
+            .groupBy("suppkey")
+            .agg(sum("quantity").alias("total_qty"))
+        )
+        action_start_time = time.time()
+        result_df.collect()
+        action_end_time = time.time()
+
+        # Calculate and print the execution time for the action
+        exec_time_w_encoding = action_end_time - action_start_time
+
+        # Show the result
+        print(f"Query execution speed with encoding and partitioning: {exec_time_w_encoding} seconds")
         
 
     def run_exercise(self, spark: SparkSession, exercise_num: int = 0):
