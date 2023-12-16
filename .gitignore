@@ -1,1 +1,4 @@
 *.tbl
+
+metastore_db/
+derby.log
