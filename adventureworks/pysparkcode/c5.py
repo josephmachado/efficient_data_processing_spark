@@ -89,7 +89,7 @@ class CodeRunner:
                     2,
                 ).alias("cumulative_sum_total_price"),
             )
-            # .orderBy("nation_name", "order_year")
+            .orderBy("nation_name", "order_year")
             .limit(20)
         )
 
