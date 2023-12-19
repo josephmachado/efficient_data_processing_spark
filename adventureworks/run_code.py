@@ -47,4 +47,4 @@ if __name__ == "__main__":
         SparkSession.builder.appName("adventureworks").enableHiveSupport().getOrCreate()
     )
     spark.sparkContext.setLogLevel("ERROR")
-    run_book_code(section=5, spark=spark, exercise_num=3)
+    run_book_code(section=5, spark=spark, exercise_num=6)
