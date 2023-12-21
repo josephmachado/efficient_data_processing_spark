@@ -17,7 +17,7 @@ FROM
     (
         SELECT
             c.name AS customer_name,
-            DATE_FORMAT(orderdate, '%y-%M') AS order_month,
+            DATE_FORMAT(orderdate, 'y-M') AS order_month,
             sum(o.totalprice) AS total_price
         FROM
             orders o
@@ -76,7 +76,7 @@ FROM
     (
         SELECT
             c.name AS customer_name,
-            DATE_FORMAT(orderdate, '%y-%M') AS order_month,
+            DATE_FORMAT(orderdate, 'y-M') AS order_month,
             sum(o.totalprice) AS total_price
         FROM
             orders o
@@ -117,7 +117,7 @@ FROM
     (
         SELECT
             c.name AS customer_name,
-            CAST(DATE_FORMAT(orderdate, '%y-%M-01') AS DATE) AS order_month,
+            CAST(DATE_FORMAT(orderdate, 'y-M-01') AS DATE) AS order_month,
             sum(o.totalprice) AS total_price
         FROM
             orders o
@@ -181,7 +181,7 @@ FROM
  SELECT
  c.name AS customer_name,
  s.name AS supplier_name,
- CAST(DATE_FORMAT(o.orderdate, '%y-%M-01') AS DATE) AS order_month,
+ CAST(DATE_FORMAT(o.orderdate, 'y-M-01') AS DATE) AS order_month,
  SUM(l.quantity) AS total_quantity
  FROM
  lineitem l
@@ -191,7 +191,7 @@ FROM
  GROUP BY
  c.name,
  s.name,
- DATE_FORMAT(o.orderdate, '%y-%M-01')
+ DATE_FORMAT(o.orderdate, 'y-M-01')
  ORDER BY
  1,
  3
@@ -215,7 +215,7 @@ FROM
  SELECT
  cn.name AS customer_nation,
  sn.name AS supplier_nation,
- CAST(DATE_FORMAT(o.orderdate, '%y-%M-01') AS DATE) AS order_month,
+ CAST(DATE_FORMAT(o.orderdate, 'y-M-01') AS DATE) AS order_month,
  ROUND(
  AVG(DATE_DIFF('day', l.shipdate, l.receiptdate)),
  2

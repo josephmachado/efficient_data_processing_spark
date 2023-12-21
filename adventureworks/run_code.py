@@ -8,7 +8,7 @@ from pyspark.sql.types import (
     TimestampType,
 )
 
-from pysparkcode import c2, c3, c4, c5
+from pysparkcode import c2, c3, c4, c5, c6
 
 
 def run_spark_sql_code(section: str, spark: SparkSession):
@@ -24,6 +24,7 @@ def run_pyspark_code(section: int, spark: SparkSession, exercise_num: int = 0):
         3: c3.CodeRunner(),
         4: c4.CodeRunner(),
         5: c5.CodeRunner(),
+        6: c6.CodeRunner(),
     }
     code_runner = section_code_map[section]
     code_runner.run_exercise(spark, exercise_num)
@@ -47,4 +48,4 @@ if __name__ == "__main__":
         SparkSession.builder.appName("adventureworks").enableHiveSupport().getOrCreate()
     )
     spark.sparkContext.setLogLevel("ERROR")
-    run_book_code(section=5, spark=spark, exercise_num=6)
+    run_book_code(section=6, spark=spark, exercise_num=2)

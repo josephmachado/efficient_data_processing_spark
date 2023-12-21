@@ -14,7 +14,11 @@ WITH duplicated_orders AS (
 ranked_orders AS (
     SELECT
         *,
-        row_number() over(PARTITION by orderkey) AS rn
+        row_number() over(
+            PARTITION by orderkey
+            ORDER BY
+                orderdate
+        ) AS rn
     FROM
         orders
 )
@@ -27,12 +31,12 @@ WHERE
 
 WITH ranked_monthly_orders AS (
     SELECT
-        date_format(orderdate, '%Y-%m') AS ordermonth,
+        date_format(orderdate, 'y-M') AS ordermonth,
         orderkey,
         custkey,
         totalprice,
         row_number() over(
-            PARTITION by date_format(orderdate, '%Y-%m'),
+            PARTITION by date_format(orderdate, 'y-M'),
             custkey
             ORDER BY
                 orderdate DESC
@@ -51,10 +55,12 @@ WHERE
     rn = 1
 ORDER BY
     custkey,
-    ordermonth;
+    ordermonth
+LIMIT
+    50;
 
 SELECT
-    date_format(orderdate, '%Y-%m') AS ordermonth,
+    date_format(orderdate, 'y-M') AS ordermonth,
     ROUND(
         AVG(
             CASE
@@ -103,16 +109,16 @@ SELECT
 FROM
     orders
 GROUP BY
-    date_format(orderdate, '%Y-%m');
+    date_format(orderdate, 'y-M');
 
 WITH monthly_orders AS (
     SELECT
-        date_format(orderdate, '%Y-%m') AS ordermonth,
+        date_format(orderdate, 'y-M') AS ordermonth,
         ROUND(SUM(totalprice) / 100000, 2) AS totalprice
     FROM
         orders
     GROUP BY
-        date_format(orderdate, '%Y-%m')
+        date_format(orderdate, 'y-M')
 )
 SELECT
     ordermonth,
@@ -138,7 +144,7 @@ ORDER BY
 
 WITH monthly_orders AS (
     SELECT
-        DATE(date_format(o.orderdate, '%Y-%m-01')) AS ordermonth,
+        DATE(date_format(o.orderdate, 'y-M-01')) AS ordermonth,
         n.name AS customer_nation,
         ROUND(SUM(o.totalprice) / 100000, 2) AS totalprice
     FROM
@@ -146,7 +152,7 @@ WITH monthly_orders AS (
         JOIN customer c ON o.custkey = c.custkey
         JOIN nation n ON c.nationkey = c.nationkey
     GROUP BY
-        date_format(o.orderdate, '%Y-%m-01'),
+        date_format(o.orderdate, 'y-M-01'),
         n.name
 )
 SELECT
@@ -177,7 +183,7 @@ ORDER BY
 
 WITH monthly_cust_nation_orders AS (
     SELECT
-        date_format(o.orderdate, '%Y-%m') AS ordermonth,
+        date_format(o.orderdate, 'y-M') AS ordermonth,
         n.name AS customer_nation,
         totalprice
     FROM

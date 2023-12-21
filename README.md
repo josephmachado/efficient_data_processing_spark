@@ -28,3 +28,9 @@ Note: tpch dbgen issues with mac https://github.com/pola-rs/tpch
 2. tables: customer.tbl lineitem.tbl nation.tbl   orders.tbl   part.tbl     partsupp.tbl region.tbl   supplier.tbl
 3. DDL query
 -->
+
+## Not currently available
+
+1. Window definition: GROUPS range
+2. recursive CTEs 6-1
+3. GROUPING SETS are called cubes in spark

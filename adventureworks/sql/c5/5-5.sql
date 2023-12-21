@@ -10,7 +10,7 @@ SELECT
 FROM
     (
         SELECT
-            date_format(orderdate, '%y-%M') AS ordermonth,
+            date_format(orderdate, 'y-M') AS ordermonth,
             ROUND(SUM(totalprice) / 100000, 2) AS total_price -- divide by 100,000 for readability
         FROM
             orders
@@ -34,7 +34,7 @@ SELECT
 FROM
     (
         SELECT
-            date_format(orderdate, '%y-%M') AS ordermonth,
+            date_format(orderdate, 'y-M') AS ordermonth,
             ROUND(SUM(totalprice) / 100000, 2) AS total_price -- divide by 100,000 for readability
         FROM
             orders
