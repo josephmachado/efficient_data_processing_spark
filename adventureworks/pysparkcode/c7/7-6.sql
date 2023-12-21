@@ -2,15 +2,7 @@ USE tpch;
 
 -- This is supposed to fail, but spark makes it work!
 SELECT
-    DATE_DIFF('day', '2022-10-01', '2022-10-05');
-
--- will fail due to in correct data type
-SELECT
-    DATE_DIFF(
-        'day',
-        CAST('2022-10-01' AS DATE),
-        CAST('2022-10-05' AS DATE)
-    );
+    DATEDIFF('2022-10-05', '2022-10-01') AS date_diff_result;
 
 SELECT
     o.orderkey,

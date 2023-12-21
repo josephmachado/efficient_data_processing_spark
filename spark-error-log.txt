@@ -17,3 +17,6 @@ n 9: Redefinition of local variable "smj_isNull_7"
 12. 23/12/10 16:34:17 WARN log: Updating partition stats fast for: lineitem_w_encoding_w_partitioning
 23/12/10 16:34:17 WARN log: Updating partition stats fast for: lineitem_w_encoding_w_partitioning
 23/12/10 16:34:17 WARN log: Updated size to 25673217
+13. 23/12/21 03:09:50 ERROR CodeGenerator: failed to compile: org.codehaus.commons.compiler.CompileException: File 'generated.java', Line 105, Column 9: Redefinition of local variable "smj_isNull_7" 
+org.codehaus.commons.compiler.CompileException: File 'generated.java', Line 105, Column 9: Redefinition of local variable "smj_isNull_7"    
+14. 23/12/21 11:47:41 WARN RowBasedKeyValueBatch: Calling spill() on RowBasedKeyValueBatch. Will not spill but return 0.
