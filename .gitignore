@@ -4,3 +4,4 @@ metastore_db/
 derby.log
 
 *.pyc
+__pycache__/
