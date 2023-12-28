@@ -17,6 +17,7 @@ services:
     hostname: localhost
     ports:
       - "4040:4040"
+      - "18080:18080"
     volumes:
       - ./adventureworks:/opt/spark/work-dir/adventureworks
 
