@@ -1,5 +1,3 @@
-USE tpch;
-
 -- Inspect data storage structure
 SHOW catalogs;
 
