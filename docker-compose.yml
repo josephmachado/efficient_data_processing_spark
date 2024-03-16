@@ -42,6 +42,8 @@ services:
       POSTGRES_DB: metadatadb
     ports:
       - "5432:5432"
+    volumes:
+      - ./containers/upstream/1-upstream-data.sql:/docker-entrypoint-initdb.d/init.sql
 
   createbuckets:
     image: minio/mc
