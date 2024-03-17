@@ -6,7 +6,7 @@ def create_tables(spark, path="s3a://rainforest/delta", database: str = "rainfor
 
     # User table
     spark.sql(f"DROP TABLE IF EXISTS {database}.user")
-    spark.sql( 
+    spark.sql(
         f"""
         CREATE TABLE {database}.user (
             user_id INT,
