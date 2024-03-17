@@ -239,3 +239,15 @@ def create_tables(spark, path="s3a://rainforest/delta", database: str = "rainfor
         LOCATION '{path}/clickstream'
     """
     )
+
+
+
+if __name__ == '__main__':
+    spark = (
+        SparkSession.builder.appName("rainforest_ddl")
+        .config("spark.executor.cores", "1")
+        .config("spark.executor.instances", "1")
+        .enableHiveSupport()
+        .getOrCreate()
+    )
+    create_tables(spark)
