@@ -9,7 +9,7 @@ CREATE TABLE AppUser (
     email VARCHAR(255) NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_updated_by INT REFERENCES AppUser(user_id),
+    last_updated_by INT ,
     last_updated_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -93,6 +93,15 @@ CREATE TABLE Clickstream (
     product_id INT REFERENCES Product(product_id),
     order_id INT REFERENCES "Order"(order_id),
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE ProductCategory (
+    product_id INTEGER,
+    category_id INTEGER,
+    PRIMARY KEY (product_id, category_id),
+    FOREIGN KEY (product_id) REFERENCES Product(product_id),
+    FOREIGN KEY (category_id) REFERENCES Category(category_id),
     created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_updated_by INT REFERENCES AppUser(user_id),
     last_updated_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP

@@ -26,12 +26,12 @@ fake = Faker()
 # Function to generate fake user data
 def generate_user_data(num_users):
     users = []
-    for _ in range(num_users):
+    for u_num in range(num_users):
         username = fake.user_name()
         email = fake.email()
         is_active = fake.boolean(chance_of_getting_true=80)
         created_ts = fake.date_time_between(start_date="-2y", end_date="now")
-        last_updated_by = None
+        last_updated_by = u_num + 1
         last_updated_ts = created_ts
         users.append(
             (username, email, is_active, created_ts, last_updated_by, last_updated_ts)
@@ -47,7 +47,7 @@ def generate_seller_data(user_ids):
             start_date="-1y", end_date="now"
         )
         created_ts = first_time_sold_timestamp
-        last_updated_by = None
+        last_updated_by = random.choice(user_ids) if user_ids else None
         last_updated_ts = created_ts
         sellers.append(
             (
@@ -69,7 +69,7 @@ def generate_buyer_data(user_ids):
             start_date="-1y", end_date="now"
         )
         created_ts = first_time_purchased_timestamp
-        last_updated_by = None
+        last_updated_by = random.choice(user_ids) if user_ids else None
         last_updated_ts = created_ts
         buyers.append(
             (
@@ -84,14 +84,14 @@ def generate_buyer_data(user_ids):
 
 
 # Function to generate fake product data
-def generate_product_data(num_products):
+def generate_product_data(num_products, user_ids):
     products = []
     for _ in range(num_products):
         name = fake.sentence(nb_words=4)[:-1]
         description = fake.paragraph(nb_sentences=3)
         price = round(random.uniform(10.0, 500.0), 2)
         created_ts = fake.date_time_between(start_date="-2y", end_date="now")
-        last_updated_by = None
+        last_updated_by = random.choice(user_ids) if user_ids else None
         last_updated_ts = created_ts
         products.append(
             (name, description, price, created_ts, last_updated_by, last_updated_ts)
@@ -110,12 +110,12 @@ def generate_seller_product_data(seller_ids, product_ids):
 
 
 # Function to generate fake category data
-def generate_category_data(num_categories):
+def generate_category_data(num_categories, user_ids):
     categories = []
     for _ in range(num_categories):
         name = fake.catch_phrase()
         created_ts = fake.date_time_between(start_date="-2y", end_date="now")
-        last_updated_by = None
+        last_updated_by = random.choice(user_ids) if user_ids else None
         last_updated_ts = created_ts
         categories.append((name, created_ts, last_updated_by, last_updated_ts))
     return categories
@@ -132,14 +132,14 @@ def generate_product_category_data(product_ids, category_ids):
 
 
 # Function to generate fake order data
-def generate_order_data(buyer_ids, num_orders):
+def generate_order_data(buyer_ids, num_orders, user_ids):
     orders = []
     for _ in range(num_orders):
         buyer_id = random.choice(buyer_ids)
         order_date = fake.date_time_between(start_date="-1y", end_date="now")
         total_price = round(random.uniform(10.0, 1000.0), 2)
         created_ts = order_date
-        last_updated_by = None
+        last_updated_by =  random.choice(user_ids) if user_ids else None
         last_updated_ts = created_ts
         orders.append(
             (
@@ -155,7 +155,7 @@ def generate_order_data(buyer_ids, num_orders):
 
 
 # Function to generate fake order_item data
-def generate_order_item_data(order_ids, seller_ids, product_ids):
+def generate_order_item_data(order_ids, seller_ids, product_ids, user_ids):
     order_items = []
     for order_id in order_ids:
         seller_id = random.choice(seller_ids)
@@ -164,7 +164,7 @@ def generate_order_item_data(order_ids, seller_ids, product_ids):
         base_price = round(random.uniform(10.0, 500.0), 2)
         tax = round(base_price * 0.08, 2)  # Assuming an 8% tax
         created_ts = fake.date_time_between(start_date="-1y", end_date="now")
-        last_updated_by = None
+        last_updated_by = random.choice(user_ids) if user_ids else None
         last_updated_ts = created_ts
         order_items.append(
             (
@@ -195,8 +195,6 @@ def generate_clickstream_data(user_ids, product_ids, order_ids):
             order_id = random.choice(order_ids) if event_type == "purchase" else None
             timestamp = fake.date_time_between(start_date="-1y", end_date="now")
             created_ts = timestamp
-            last_updated_by = None
-            last_updated_ts = created_ts
             clickstreams.append(
                 (
                     user_id,
@@ -205,8 +203,6 @@ def generate_clickstream_data(user_ids, product_ids, order_ids):
                     order_id,
                     timestamp,
                     created_ts,
-                    last_updated_by,
-                    last_updated_ts,
                 )
             )
     return clickstreams
@@ -218,12 +214,12 @@ num_products = 500
 
 # Generate and insert user data
 user_data = generate_user_data(num_users)
-insert_query = 'INSERT INTO "User" (username, email, is_active, created_ts, last_updated_by, last_updated_ts) VALUES %s'
+insert_query = 'INSERT INTO AppUser (username, email, is_active, created_ts, last_updated_by, last_updated_ts) VALUES %s'
 execute_values(cur, insert_query, user_data)
 conn.commit()
 
 # Get user IDs for other tables
-cur.execute('SELECT user_id FROM "User"')
+cur.execute('SELECT user_id FROM AppUser')
 user_ids = [row[0] for row in cur.fetchall()]
 
 # Generate and insert seller data
@@ -239,7 +235,7 @@ execute_values(cur, insert_query, buyer_data)
 conn.commit()
 
 # Generate and insert product data
-product_data = generate_product_data(num_products)
+product_data = generate_product_data(num_products, user_ids)
 insert_query = "INSERT INTO Product (name, description, price, created_ts, last_updated_by, last_updated_ts) VALUES %s"
 execute_values(cur, insert_query, product_data)
 conn.commit()
@@ -259,7 +255,7 @@ conn.commit()
 
 # Generate and insert category data
 num_categories = 20
-category_data = generate_category_data(num_categories)
+category_data = generate_category_data(num_categories, user_ids)
 insert_query = "INSERT INTO Category (name, created_ts, last_updated_by, last_updated_ts) VALUES %s"
 execute_values(cur, insert_query, category_data)
 conn.commit()
@@ -280,7 +276,7 @@ buyer_ids = [row[0] for row in cur.fetchall()]
 
 # Generate and insert order data
 num_orders = 5000
-order_data = generate_order_data(buyer_ids, num_orders)
+order_data = generate_order_data(buyer_ids, num_orders, user_ids)
 insert_query = 'INSERT INTO "Order" (buyer_id, order_date, total_price, created_ts, last_updated_by, last_updated_ts) VALUES %s'
 execute_values(cur, insert_query, order_data)
 conn.commit()
@@ -290,18 +286,18 @@ cur.execute('SELECT order_id FROM "Order"')
 order_ids = [row[0] for row in cur.fetchall()]
 
 # Generate and insert order_item data
-order_item_data = generate_order_item_data(order_ids, seller_ids, product_ids)
+order_item_data = generate_order_item_data(order_ids, seller_ids, product_ids, user_ids)
 insert_query = "INSERT INTO OrderItem (order_id, product_id, seller_id, quantity, base_price, tax, created_ts, last_updated_by, last_updated_ts) VALUES %s"
 execute_values(cur, insert_query, order_item_data)
 conn.commit()
 
 # Get user IDs for clickstream table
-cur.execute('SELECT user_id FROM "User"')
+cur.execute('SELECT user_id FROM AppUser')
 user_ids = [row[0] for row in cur.fetchall()]
 
 # Generate and insert clickstream data
 clickstream_data = generate_clickstream_data(user_ids, product_ids, order_ids)
-insert_query = "INSERT INTO Clickstream (user_id, event_type, product_id, order_id, timestamp, created_ts, last_updated_by, last_updated_ts) VALUES %s"
+insert_query = "INSERT INTO Clickstream (user_id, event_type, product_id, order_id, timestamp, created_ts) VALUES %s"
 execute_values(cur, insert_query, clickstream_data)
 conn.commit()
 
