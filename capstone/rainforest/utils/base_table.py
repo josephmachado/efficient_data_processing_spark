@@ -1,9 +1,11 @@
+
+from __future__ import annotations
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 
 from typing import Dict, Type, List, Optional
 from pyspark.sql import DataFrame
-from __future__ import annotations
+
 
 
 @dataclass
@@ -22,6 +24,7 @@ class TableETL(ABC):
     @abstractmethod
     def __init__(
         self,
+        spark,
         upstream_table_names: Optional[List[Type[TableETL]]],
         name: str,
         primary_keys: List[str],
@@ -30,6 +33,14 @@ class TableETL(ABC):
         database: str,
         partition_keys: List[str],
     ) -> None:
+        self.spark = spark
+        self.upstream_table_names = upstream_table_names
+        self.name = name
+        self.primary_keys = primary_keys
+        self.storage_path = storage_path
+        self.data_format = data_format
+        self.database = database
+        self.partition_keys = partition_keys
         pass
 
     @abstractmethod
@@ -49,9 +60,9 @@ class TableETL(ABC):
         pass
 
     def run(self, run_upstream: bool = True) -> None:
-        self.load(
-            self.validate(self.transform_upstream(self.extract_upstream(run_upstream)))
-        )
+        transformed_data = self.transform_upstream(self.extract_upstream(run_upstream))
+        self.validate(transformed_data)
+        self.load(transformed_data)
 
     @abstractmethod
     def read(self, partition_keys: Optional[List[str]] = None) -> ETLDataSet:

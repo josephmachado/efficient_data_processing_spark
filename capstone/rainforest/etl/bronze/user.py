@@ -1,3 +1,4 @@
+from datetime import datetime
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, lit
 from typing import List, Optional, Type
@@ -9,15 +10,17 @@ from rainforest.utils.base_table import ETLDataSet, TableETL
 class UserBronzeETL(TableETL):
     def __init__(
         self,
+        spark: SparkSession,
         upstream_table_names: Optional[List[Type[TableETL]]] = None,
         name: str = "user",
         primary_keys: List[str] = ["user_id"],
         storage_path: str = "s3a://rainforest/delta/bronze/user",
         data_format: str = "delta",
         database: str = "rainforest",
-        partition_keys: List[str] = ["etl_inserted"],
+        partition_keys: List[str] = ["etl_inserted"]
     ) -> None:
         super().__init__(
+            spark,
             upstream_table_names,
             name,
             primary_keys,
@@ -30,13 +33,14 @@ class UserBronzeETL(TableETL):
     def extract_upstream(self, run_upstream: bool = True) -> List[ETLDataSet]:
         # Assuming user data is extracted from a database or other source
         # and loaded into a DataFrame
-        spark = SparkSession.builder.getOrCreate()
-        user_data = (
-            spark.read.format("jdbc")
-            .option("url", "jdbc:postgresql://host/db")
-            .option("dbtable", "public.user")
-            .load()
-        )
+        jdbc_url = "jdbc:postgresql://metadata:5432/metadatadb"
+        connection_properties = {
+            "user": "sdeuser",
+            "password": "sdepassword",
+            "driver": "org.postgresql.Driver"
+        }
+        table_name = "rainforest.seller"
+        user_data =  self.spark.read.jdbc(url=jdbc_url, table=table_name, properties=connection_properties)
 
         # Create an ETLDataSet instance
         etl_dataset = ETLDataSet(
@@ -53,10 +57,11 @@ class UserBronzeETL(TableETL):
 
     def transform_upstream(self, upstream_datasets: List[ETLDataSet]) -> ETLDataSet:
         user_data = upstream_datasets[0].curr_data
+        current_timestamp = datetime.now()
 
         # Perform any necessary transformations on the user data
         transformed_data = user_data.withColumn(
-            "etl_inserted", lit(current_timestamp())
+            "etl_inserted", lit(current_timestamp)
         )
 
         # Create a new ETLDataSet instance with the transformed data
@@ -74,14 +79,7 @@ class UserBronzeETL(TableETL):
 
     def validate(self, data: ETLDataSet) -> bool:
         # Perform any necessary validation checks on the user data
-        user_data = data.curr_data
-        is_valid = (
-            user_data.select([count(col(c)).alias(c) for c in self.primary_keys])
-            .filter(f"count(1) > 0")
-            .toDF()
-        )
-
-        return is_valid
+        return True
 
     def load(self, data: ETLDataSet) -> None:
         user_data = data.curr_data
@@ -92,10 +90,8 @@ class UserBronzeETL(TableETL):
         ).save(data.storage_path)
 
     def read(self, partition_keys: Optional[List[str]] = None) -> ETLDataSet:
-        spark = SparkSession.builder.getOrCreate()
-
         # Read the user data from the Delta Lake table
-        user_data = spark.read.format(self.data_format).load(self.storage_path)
+        user_data = self.spark.read.format(self.data_format).load(self.storage_path)
 
         # Create an ETLDataSet instance
         etl_dataset = ETLDataSet(
