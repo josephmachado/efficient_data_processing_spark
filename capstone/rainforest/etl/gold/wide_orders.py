@@ -2,20 +2,19 @@ from datetime import datetime
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, lit
 from typing import List, Optional, Type
-from dataclasses import asdict
 from rainforest.utils.base_table import ETLDataSet, TableETL
-from rainforest.etl.bronze.appuser import AppUserBronzeETL
-from rainforest.etl.bronze.seller import SellerBronzeETL
+from rainforest.etl.silver.dim_seller import DimSellerSilverETL
+from rainforest.etl.silver.fct_orders import FactOrdersSilverETL
 
 
-class DimSellerSilverETL(TableETL):
+class WideOrdersGoldETL(TableETL):
     def __init__(
         self,
         spark: SparkSession,
-        upstream_table_names: Optional[List[Type[TableETL]]] = [AppUserBronzeETL, SellerBronzeETL],
-        name: str = "dim_seller",
-        primary_keys: List[str] = ["seller_id"],
-        storage_path: str = "s3a://rainforest/delta/silver/dim_seller",
+        upstream_table_names: Optional[List[Type[TableETL]]] = [FactOrdersSilverETL, DimSellerSilverETL],
+        name: str = "wide_orders",
+        primary_keys: List[str] = ["order_id"],
+        storage_path: str = "s3a://rainforest/delta/gold/wide_orders",
         data_format: str = "delta",
         database: str = "rainforest",
         partition_keys: List[str] = ["etl_inserted"]
@@ -42,39 +41,22 @@ class DimSellerSilverETL(TableETL):
         return upstream_etl_datasets
 
     def transform_upstream(self, upstream_datasets: List[ETLDataSet]) -> ETLDataSet:
-        appuser_data = upstream_datasets[0].curr_data
-        seller_data = upstream_datasets[1].curr_data
+        fact_orders_data = upstream_datasets[0].curr_data
+        dim_seller_data = upstream_datasets[1].curr_data
         current_timestamp = datetime.now()
 
-        # Get common columns in both appuser_data and seller_data
-        common_columns = set(appuser_data.columns).intersection(seller_data.columns)
+        # Perform left join between fact_orders_data and dim_seller_data
+        wide_orders_data = fact_orders_data.join(dim_seller_data, fact_orders_data["buyer_id"] == dim_seller_data["seller_id"], "left")
 
-        # Rename common columns in appuser_data to avoid conflicts
-        appuser_data = appuser_data.selectExpr(
-            *[f"`{col}` as appuser_{col}" if col in common_columns and col != "user_id" else col for col in appuser_data.columns]
-        )
-
-        # Rename common columns in seller_data to avoid conflicts
-        seller_data = seller_data.selectExpr(
-            *[f"`{col}` as seller_{col}" if col in common_columns and col != "user_id" else col for col in seller_data.columns]
-        )
-
-        # Perform the join based on user_id key
-        dim_seller_data = appuser_data.join(
-            seller_data, appuser_data["user_id"] == seller_data["user_id"], "inner"
-        )
-
-        # Drop the user_id column from the seller_data DataFrame
-        dim_seller_data = dim_seller_data.drop(seller_data["user_id"])
-
-        transformed_data = dim_seller_data.withColumn(
+        # Add etl_inserted column
+        wide_orders_data = wide_orders_data.withColumn(
             "etl_inserted", lit(current_timestamp)
         )
 
         # Create a new ETLDataSet instance with the transformed data
         etl_dataset = ETLDataSet(
             name=self.name,
-            curr_data=transformed_data,
+            curr_data=wide_orders_data,
             primary_keys=self.primary_keys,
             storage_path=self.storage_path,
             data_format=self.data_format,
@@ -89,21 +71,21 @@ class DimSellerSilverETL(TableETL):
         return True
 
     def load(self, data: ETLDataSet) -> None:
-        dim_seller_data = data.curr_data
+        wide_orders_data = data.curr_data
 
         # Write the transformed data to the Delta Lake table
-        dim_seller_data.write.option("mergeSchema", "true").format(data.data_format).mode("overwrite").partitionBy(
+        wide_orders_data.write.option("mergeSchema", "true").format(data.data_format).mode("overwrite").partitionBy(
             data.partition_keys
         ).save(data.storage_path)
 
     def read(self, partition_keys: Optional[List[str]] = None) -> ETLDataSet:
         # Read the transformed data from the Delta Lake table
-        dim_seller_data = self.spark.read.format(self.data_format).load(self.storage_path)
+        wide_orders_data = self.spark.read.format(self.data_format).load(self.storage_path)
 
         # Create an ETLDataSet instance
         etl_dataset = ETLDataSet(
             name=self.name,
-            curr_data=dim_seller_data,
+            curr_data=wide_orders_data,
             primary_keys=self.primary_keys,
             storage_path=self.storage_path,
             data_format=self.data_format,

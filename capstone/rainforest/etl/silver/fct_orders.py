@@ -4,18 +4,17 @@ from pyspark.sql.functions import col, lit
 from typing import List, Optional, Type
 from dataclasses import asdict
 from rainforest.utils.base_table import ETLDataSet, TableETL
-from rainforest.etl.bronze.appuser import AppUserBronzeETL
-from rainforest.etl.bronze.seller import SellerBronzeETL
+from rainforest.etl.bronze.orders import OrdersSilverETL
 
 
-class DimSellerSilverETL(TableETL):
+class FactOrdersSilverETL(TableETL):
     def __init__(
         self,
         spark: SparkSession,
-        upstream_table_names: Optional[List[Type[TableETL]]] = [AppUserBronzeETL, SellerBronzeETL],
-        name: str = "dim_seller",
-        primary_keys: List[str] = ["seller_id"],
-        storage_path: str = "s3a://rainforest/delta/silver/dim_seller",
+        upstream_table_names: Optional[List[Type[TableETL]]] = [OrdersSilverETL],
+        name: str = "fact_orders",
+        primary_keys: List[str] = ["order_id"],
+        storage_path: str = "s3a://rainforest/delta/silver/fact_orders",
         data_format: str = "delta",
         database: str = "rainforest",
         partition_keys: List[str] = ["etl_inserted"]
@@ -42,32 +41,21 @@ class DimSellerSilverETL(TableETL):
         return upstream_etl_datasets
 
     def transform_upstream(self, upstream_datasets: List[ETLDataSet]) -> ETLDataSet:
-        appuser_data = upstream_datasets[0].curr_data
-        seller_data = upstream_datasets[1].curr_data
+        order_data = upstream_datasets[0].curr_data
         current_timestamp = datetime.now()
 
-        # Get common columns in both appuser_data and seller_data
-        common_columns = set(appuser_data.columns).intersection(seller_data.columns)
+        # Convert total price to USD and INR
+        usd_conversion_rate = 0.014  # Assume 1 USD = 70 INR
+        inr_conversion_rate = 70
 
-        # Rename common columns in appuser_data to avoid conflicts
-        appuser_data = appuser_data.selectExpr(
-            *[f"`{col}` as appuser_{col}" if col in common_columns and col != "user_id" else col for col in appuser_data.columns]
+        transformed_data = order_data.withColumn(
+            "total_price_usd", col("total_price") * lit(usd_conversion_rate)
+        ).withColumn(
+            "total_price_inr", col("total_price") * lit(inr_conversion_rate)
         )
 
-        # Rename common columns in seller_data to avoid conflicts
-        seller_data = seller_data.selectExpr(
-            *[f"`{col}` as seller_{col}" if col in common_columns and col != "user_id" else col for col in seller_data.columns]
-        )
-
-        # Perform the join based on user_id key
-        dim_seller_data = appuser_data.join(
-            seller_data, appuser_data["user_id"] == seller_data["user_id"], "inner"
-        )
-
-        # Drop the user_id column from the seller_data DataFrame
-        dim_seller_data = dim_seller_data.drop(seller_data["user_id"])
-
-        transformed_data = dim_seller_data.withColumn(
+        # Add etl_inserted column
+        transformed_data = transformed_data.withColumn(
             "etl_inserted", lit(current_timestamp)
         )
 
@@ -89,21 +77,21 @@ class DimSellerSilverETL(TableETL):
         return True
 
     def load(self, data: ETLDataSet) -> None:
-        dim_seller_data = data.curr_data
+        order_data = data.curr_data
 
         # Write the transformed data to the Delta Lake table
-        dim_seller_data.write.option("mergeSchema", "true").format(data.data_format).mode("overwrite").partitionBy(
+        order_data.write.option("mergeSchema", "true").format(data.data_format).mode("overwrite").partitionBy(
             data.partition_keys
         ).save(data.storage_path)
 
     def read(self, partition_keys: Optional[List[str]] = None) -> ETLDataSet:
         # Read the transformed data from the Delta Lake table
-        dim_seller_data = self.spark.read.format(self.data_format).load(self.storage_path)
+        order_data = self.spark.read.format(self.data_format).load(self.storage_path)
 
         # Create an ETLDataSet instance
         etl_dataset = ETLDataSet(
             name=self.name,
-            curr_data=dim_seller_data,
+            curr_data=order_data,
             primary_keys=self.primary_keys,
             storage_path=self.storage_path,
             data_format=self.data_format,

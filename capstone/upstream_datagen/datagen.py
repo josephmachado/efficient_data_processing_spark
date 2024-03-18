@@ -146,9 +146,7 @@ def generate_order_data(buyer_ids, num_orders, user_ids):
                 buyer_id,
                 order_date,
                 total_price,
-                created_ts,
-                last_updated_by,
-                last_updated_ts,
+                created_ts
             )
         )
     return orders
@@ -175,8 +173,6 @@ def generate_order_item_data(order_ids, seller_ids, product_ids, user_ids):
                 base_price,
                 tax,
                 created_ts,
-                last_updated_by,
-                last_updated_ts,
             )
         )
     return order_items
@@ -277,17 +273,17 @@ buyer_ids = [row[0] for row in cur.fetchall()]
 # Generate and insert order data
 num_orders = 5000
 order_data = generate_order_data(buyer_ids, num_orders, user_ids)
-insert_query = 'INSERT INTO "Order" (buyer_id, order_date, total_price, created_ts, last_updated_by, last_updated_ts) VALUES %s'
+insert_query = 'INSERT INTO orders (buyer_id, order_date, total_price, created_ts) VALUES %s'
 execute_values(cur, insert_query, order_data)
 conn.commit()
 
 # Get order IDs for order_item table
-cur.execute('SELECT order_id FROM "Order"')
+cur.execute('SELECT order_id FROM orders')
 order_ids = [row[0] for row in cur.fetchall()]
 
 # Generate and insert order_item data
 order_item_data = generate_order_item_data(order_ids, seller_ids, product_ids, user_ids)
-insert_query = "INSERT INTO OrderItem (order_id, product_id, seller_id, quantity, base_price, tax, created_ts, last_updated_by, last_updated_ts) VALUES %s"
+insert_query = "INSERT INTO OrderItem (order_id, product_id, seller_id, quantity, base_price, tax, created_ts) VALUES %s"
 execute_values(cur, insert_query, order_item_data)
 conn.commit()
 
