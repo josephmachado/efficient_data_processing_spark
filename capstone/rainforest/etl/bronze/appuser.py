@@ -7,7 +7,7 @@ from abc import ABC
 from rainforest.utils.base_table import ETLDataSet, TableETL
 
 
-class UserBronzeETL(TableETL):
+class AppUserBronzeETL(TableETL):
     def __init__(
         self,
         spark: SparkSession,
