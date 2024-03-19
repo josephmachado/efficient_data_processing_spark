@@ -84,7 +84,7 @@ def run_code(spark):
     silver_seller_x_product = SellerProductSilverETL(spark=spark)
     silver_seller_x_product.run()
     silver_seller_x_product.read().curr_data.show(10)
-    """
+    
     from rainforest.etl.silver.dim_product import DimProductSilverETL
 
     print("=================================")
@@ -94,12 +94,29 @@ def run_code(spark):
     silver_dim_product.run()
     silver_dim_product.read().curr_data.show(10)
 
-    """
+    
     gold_daily_order_metrics = DailyOrderMetricsGoldETL(spark=spark)
     gold_daily_order_metrics.run()
     create_daily_order_report_view(gold_daily_order_metrics.read().curr_data)
     spark.sql("select * from global_temp.daily_order_report").show()
+    
+    from rainforest.etl.silver.product_x_category import ProductCategorySilverETL
+
+    print("=================================")
+    print("Running Silver seller_x_product ETL")
+    print("=================================")
+    silver_seller_x_product = ProductCategorySilverETL(spark=spark)
+    silver_seller_x_product.run()
+    silver_seller_x_product.read().curr_data.show(10)
     """
+
+    from rainforest.etl.gold.wide_order_items import WideOrderItemsGoldETL
+    print("=================================")
+    print("Running wide order items ETL")
+    print("=================================")
+    silver_seller_x_product = WideOrderItemsGoldETL(spark=spark)
+    silver_seller_x_product.run()
+    silver_seller_x_product.read().curr_data.show(10)
 
 
 if __name__ == "__main__":
