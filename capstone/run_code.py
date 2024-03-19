@@ -6,15 +6,9 @@ from rainforest.etl.silver.dim_seller import DimSellerSilverETL
 from rainforest.etl.silver.fct_orders import FactOrdersSilverETL
 from rainforest.etl.gold.wide_orders import WideOrdersGoldETL
 
+
 def run_code(spark):
-    """
-    print("=================================")
-    print("Running Bronze Orders ETL")
-    print("=================================")
-    bronze_orders = OrdersSilverETL(spark=spark)
-    bronze_orders.run()
-    bronze_orders.read().curr_data.show(10)
-    
+
     print("=================================")
     print("Running Bronze user ETL")
     print("=================================")
@@ -22,12 +16,20 @@ def run_code(spark):
     bronze_user.run()
     bronze_user.read().curr_data.show(10)
     print("=================================")
+    print("Running Bronze Orders ETL")
+    print("=================================")
+    bronze_orders = OrdersSilverETL(spark=spark)
+    bronze_orders.run()
+    bronze_orders.read().curr_data.show(10)
+
+    print("=================================")
     print("Running Bronze seller ETL")
     print("=================================")
     bronze_seller = SellerBronzeETL(spark=spark)
     bronze_seller.run()
     bronze_seller.read().curr_data.show(10)
-    
+
+    """
     print("=================================")
     print("Running Silver dim_seller ETL")
     print("=================================")
@@ -41,13 +43,14 @@ def run_code(spark):
     silver_fct_orders = FactOrdersSilverETL(spark=spark)
     silver_fct_orders.run()
     silver_fct_orders.read().curr_data.show(10)
-    """
     print("=================================")
     print("Running Gold wide_orders ETL")
     print("=================================")
     gold_wide_orders = WideOrdersGoldETL(spark=spark)
     gold_wide_orders.run()
     gold_wide_orders.read().curr_data.show(10)
+    """
+
 
 if __name__ == "__main__":
     # Create a spark session

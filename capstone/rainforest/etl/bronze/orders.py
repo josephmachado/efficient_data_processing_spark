@@ -5,6 +5,7 @@ from typing import List, Optional, Type
 from dataclasses import asdict
 from rainforest.utils.base_table import ETLDataSet, TableETL
 
+
 class OrdersSilverETL(TableETL):
     def __init__(
         self,
@@ -15,7 +16,7 @@ class OrdersSilverETL(TableETL):
         storage_path: str = "s3a://rainforest/delta/bronze/orders",
         data_format: str = "delta",
         database: str = "rainforest",
-        partition_keys: List[str] = ["etl_inserted"]
+        partition_keys: List[str] = ["etl_inserted"],
     ) -> None:
         super().__init__(
             spark,
@@ -33,10 +34,12 @@ class OrdersSilverETL(TableETL):
         connection_properties = {
             "user": "sdeuser",
             "password": "sdepassword",
-            "driver": "org.postgresql.Driver"
+            "driver": "org.postgresql.Driver",
         }
         table_name = "rainforest.orders"
-        order_data =  self.spark.read.jdbc(url=jdbc_url, table=table_name, properties=connection_properties)
+        order_data = self.spark.read.jdbc(
+            url=jdbc_url, table=table_name, properties=connection_properties
+        )
 
         # Create an ETLDataSet instance
         etl_dataset = ETLDataSet(
@@ -51,23 +54,16 @@ class OrdersSilverETL(TableETL):
 
         return [etl_dataset]
 
-
     def transform_upstream(self, upstream_datasets: List[ETLDataSet]) -> ETLDataSet:
         order_data = upstream_datasets[0].curr_data
         current_timestamp = datetime.now()
 
         # Rename columns in order_data to avoid conflicts
         order_data = order_data.selectExpr(
-            "order_id",
-            "buyer_id",
-            "order_date",
-            "total_price",
-            "created_ts"
+            "order_id", "buyer_id", "order_date", "total_price", "created_ts"
         )
 
-        transformed_data = order_data.withColumn(
-            "etl_inserted", lit(current_timestamp)
-        )
+        transformed_data = order_data.withColumn("etl_inserted", lit(current_timestamp))
 
         # Create a new ETLDataSet instance with the transformed data
         etl_dataset = ETLDataSet(
@@ -90,18 +86,27 @@ class OrdersSilverETL(TableETL):
         order_data = data.curr_data
 
         # Write the transformed data to the Delta Lake table
-        order_data.write.option("mergeSchema", "true").format(data.data_format).mode("overwrite").partitionBy(
-            data.partition_keys
-        ).save(data.storage_path)
+        order_data.write.option("mergeSchema", "true").format(data.data_format).mode(
+            "overwrite"
+        ).partitionBy(data.partition_keys).save(data.storage_path)
 
     def read(self, partition_keys: Optional[List[str]] = None) -> ETLDataSet:
         # Read the transformed data from the Delta Lake table
-        order_data = self.spark.read.format(self.data_format).load(self.storage_path)
+        orders_data = self.spark.read.format(self.data_format).load(self.storage_path)
+        # Explicitly select columns
+        orders_data = orders_data.select(
+            col("order_id"),
+            col("buyer_id"),
+            col("order_date"),
+            col("total_price"),
+            col("created_ts"),
+            col("etl_inserted"),
+        )
 
         # Create an ETLDataSet instance
         etl_dataset = ETLDataSet(
             name=self.name,
-            curr_data=order_data,
+            curr_data=orders_data,
             primary_keys=self.primary_keys,
             storage_path=self.storage_path,
             data_format=self.data_format,

@@ -5,6 +5,7 @@ from typing import List, Optional, Type
 from dataclasses import asdict
 from rainforest.utils.base_table import ETLDataSet, TableETL
 
+
 class SellerBronzeETL(TableETL):
     def __init__(
         self,
@@ -15,7 +16,7 @@ class SellerBronzeETL(TableETL):
         storage_path: str = "s3a://rainforest/delta/bronze/seller",
         data_format: str = "delta",
         database: str = "rainforest",
-        partition_keys: List[str] = ["etl_inserted"]
+        partition_keys: List[str] = ["etl_inserted"],
     ) -> None:
         super().__init__(
             spark,
@@ -35,10 +36,12 @@ class SellerBronzeETL(TableETL):
         connection_properties = {
             "user": "sdeuser",
             "password": "sdepassword",
-            "driver": "org.postgresql.Driver"
+            "driver": "org.postgresql.Driver",
         }
         table_name = "rainforest.seller"
-        seller_data =  self.spark.read.jdbc(url=jdbc_url, table=table_name, properties=connection_properties)
+        seller_data = self.spark.read.jdbc(
+            url=jdbc_url, table=table_name, properties=connection_properties
+        )
 
         # Create an ETLDataSet instance
         etl_dataset = ETLDataSet(
@@ -90,6 +93,17 @@ class SellerBronzeETL(TableETL):
     def read(self, partition_keys: Optional[List[str]] = None) -> ETLDataSet:
         # Read the seller data from the Delta Lake table
         seller_data = self.spark.read.format(self.data_format).load(self.storage_path)
+
+        # Explicitly select columns
+        seller_data = seller_data.select(
+            col("seller_id"),
+            col("user_id"),
+            col("first_time_sold_timestamp"),
+            col("created_ts"),
+            col("last_updated_by"),
+            col("last_updated_ts"),
+            col("etl_inserted"),
+        )
 
         # Create an ETLDataSet instance
         etl_dataset = ETLDataSet(
