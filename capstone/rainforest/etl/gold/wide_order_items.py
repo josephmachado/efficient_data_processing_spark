@@ -112,6 +112,7 @@ class WideOrderItemsGoldETL(TableETL):
             col('quantity'), 
             col('base_price'),
             col('actual_price'), 
+            col('created_ts'),
             col('tax'), 
             col('categories'), 
             col('etl_inserted')

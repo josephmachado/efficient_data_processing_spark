@@ -1,19 +1,19 @@
 from datetime import datetime
+from pyspark.sql import functions as F
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, lit, sum as spark_sum, mean as spark_mean, date_format, to_date
 from typing import List, Optional, Type
 from rainforest.utils.base_table import ETLDataSet, TableETL
-from rainforest.etl.gold.wide_orders import WideOrdersGoldETL
+from rainforest.etl.gold.wide_order_items import WideOrderItemsGoldETL
 
 
-class DailyOrderMetricsGoldETL(TableETL):
+class DailyCategoryMetricsGoldETL(TableETL):
     def __init__(
         self,
         spark: SparkSession,
-        upstream_table_names: Optional[List[Type[TableETL]]] = [WideOrdersGoldETL],
-        name: str = "daily_order_metrics",
-        primary_keys: List[str] = ["order_ts"],
-        storage_path: str = "s3a://rainforest/delta/gold/daily_order_metrics",
+        upstream_table_names: Optional[List[Type[TableETL]]] = [WideOrderItemsGoldETL],
+        name: str = "daily_category_metrics",
+        primary_keys: List[str] = ["order_date", "category"],
+        storage_path: str = "s3a://rainforest/delta/gold/daily_category_metrics",
         data_format: str = "delta",
         database: str = "rainforest",
         partition_keys: List[str] = ["etl_inserted"],
@@ -43,24 +43,35 @@ class DailyOrderMetricsGoldETL(TableETL):
 
     def transform_upstream(self, upstream_datasets: List[ETLDataSet]) -> ETLDataSet:
         wide_orders_data = upstream_datasets[0].curr_data
-        wide_orders_data = wide_orders_data.withColumn("order_date", col("order_ts").cast("date"))
+        wide_orders_data = wide_orders_data.withColumn("order_date", F.col("created_ts").cast("date"))
 
         # Filter out non-active users
-        wide_orders_data = wide_orders_data.filter(col('is_active'))
+        wide_orders_data = wide_orders_data.filter(F.col('is_active'))
 
-        # Group by order_ts and calculate sum and mean of total_price
-        daily_metrics_data = wide_orders_data.groupBy('order_date').agg(
-            spark_sum('total_price').alias('total_price_sum'),
-            spark_mean('total_price').alias('total_price_mean')
+        # Explode the categories array to get each category as a separate row
+        df_exploded = wide_orders_data.select(
+            "order_id",
+            "order_date",
+            "product_id",
+            "categories",
+            "actual_price",
+            F.explode("categories").alias("category"),
+            "etl_inserted"
+        )
+
+        # Group by order_date and category, calculate mean and median actual price
+        category_metrics_data = df_exploded.groupBy("order_date", "category").agg(
+            F.mean("actual_price").alias("mean_actual_price"),
+            F.expr("percentile_approx(actual_price, 0.5)").alias("median_actual_price")
         )
 
         current_timestamp = datetime.now()
-        daily_metrics_data = daily_metrics_data.withColumn("etl_inserted", lit(current_timestamp))
+        category_metrics_data = category_metrics_data.withColumn("etl_inserted", F.lit(current_timestamp))
 
         # Create a new ETLDataSet instance with the transformed data
         etl_dataset = ETLDataSet(
             name=self.name,
-            curr_data=daily_metrics_data,
+            curr_data=category_metrics_data,
             primary_keys=self.primary_keys,
             storage_path=self.storage_path,
             data_format=self.data_format,
@@ -75,10 +86,10 @@ class DailyOrderMetricsGoldETL(TableETL):
         return True
 
     def load(self, data: ETLDataSet) -> None:
-        daily_metrics_data = data.curr_data
+        category_metrics_data = data.curr_data
 
         # Write the transformed data to the Delta Lake table
-        daily_metrics_data.write.option("mergeSchema", "true").format(data.data_format).mode("overwrite").partitionBy(
+        category_metrics_data.write.option("mergeSchema", "true").format(data.data_format).mode("overwrite").partitionBy(
             data.partition_keys
         ).save(data.storage_path)
     
