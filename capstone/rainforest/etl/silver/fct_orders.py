@@ -86,12 +86,23 @@ class FactOrdersSilverETL(TableETL):
 
     def read(self, partition_keys: Optional[List[str]] = None) -> ETLDataSet:
         # Read the transformed data from the Delta Lake table
-        order_data = self.spark.read.format(self.data_format).load(self.storage_path)
+        orders_data = self.spark.read.format(self.data_format).load(self.storage_path)
+        # Explicitly select columns
+        orders_data = orders_data.select(
+            col("order_id"),
+            col("buyer_id"),
+            col("order_date"),
+            col("total_price"),
+            col("total_price_usd"),
+            col("total_price_inr"),
+            col("created_ts"),
+            col("etl_inserted"),
+        )
 
         # Create an ETLDataSet instance
         etl_dataset = ETLDataSet(
             name=self.name,
-            curr_data=order_data,
+            curr_data=orders_data,
             primary_keys=self.primary_keys,
             storage_path=self.storage_path,
             data_format=self.data_format,

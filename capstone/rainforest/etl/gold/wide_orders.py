@@ -48,8 +48,8 @@ class WideOrdersGoldETL(TableETL):
         # Perform left join between fact_orders_data and dim_seller_data
         wide_orders_data = fact_orders_data.join(dim_seller_data, fact_orders_data["buyer_id"] == dim_seller_data["seller_id"], "left")
 
-        # Add etl_inserted column
-        wide_orders_data = wide_orders_data.withColumn(
+        # Drop upstream table's etl_inserted ts
+        wide_orders_data = wide_orders_data.drop(fact_orders_data["etl_inserted"]).drop(dim_seller_data["etl_inserted"]).withColumn(
             "etl_inserted", lit(current_timestamp)
         )
 
@@ -81,6 +81,32 @@ class WideOrdersGoldETL(TableETL):
     def read(self, partition_keys: Optional[List[str]] = None) -> ETLDataSet:
         # Read the transformed data from the Delta Lake table
         wide_orders_data = self.spark.read.format(self.data_format).load(self.storage_path)
+
+        # Select the desired columns
+        selected_columns = [
+            col('order_id'), 
+            col('buyer_id'), 
+            col('order_date'), 
+            col('total_price'), 
+            col('total_price_usd'), 
+            col('total_price_inr'), 
+            col('created_ts'), 
+            col('user_id'), 
+            col('username'), 
+            col('email'), 
+            col('is_active'), 
+            col('appuser_created_ts'), 
+            col('appuser_last_updated_by'), 
+            col('appuser_last_updated_ts'), 
+            col('seller_id'), 
+            col('first_time_sold_timestamp'), 
+            col('seller_created_ts'), 
+            col('seller_last_updated_by'), 
+            col('seller_last_updated_ts'), 
+            col('etl_inserted')
+        ]
+
+        wide_orders_data = wide_orders_data.select(selected_columns)
 
         # Create an ETLDataSet instance
         etl_dataset = ETLDataSet(

@@ -100,6 +100,25 @@ class DimSellerSilverETL(TableETL):
         # Read the transformed data from the Delta Lake table
         dim_seller_data = self.spark.read.format(self.data_format).load(self.storage_path)
 
+        # Select the desired columns
+        selected_columns = [
+            col('user_id'), 
+            col('username'), 
+            col('email'), 
+            col('is_active'), 
+            col('appuser_created_ts'), 
+            col('appuser_last_updated_by'), 
+            col('appuser_last_updated_ts'),
+            col('seller_id'), 
+            col('first_time_sold_timestamp'), 
+            col('seller_created_ts'), 
+            col('seller_last_updated_by'), 
+            col('seller_last_updated_ts'),
+            col('etl_inserted')
+        ]
+
+        dim_seller_data = dim_seller_data.select(selected_columns)
+
         # Create an ETLDataSet instance
         etl_dataset = ETLDataSet(
             name=self.name,

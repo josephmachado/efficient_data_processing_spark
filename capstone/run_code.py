@@ -8,6 +8,7 @@ from rainforest.etl.gold.wide_orders import WideOrdersGoldETL
 
 
 def run_code(spark):
+    """
 
     print("=================================")
     print("Running Bronze user ETL")
@@ -28,28 +29,29 @@ def run_code(spark):
     bronze_seller = SellerBronzeETL(spark=spark)
     bronze_seller.run()
     bronze_seller.read().curr_data.show(10)
-
-    """
+    
+    
     print("=================================")
     print("Running Silver dim_seller ETL")
     print("=================================")
     silver_dim_seller = DimSellerSilverETL(spark=spark, upstream_table_names=[AppUserBronzeETL, SellerBronzeETL])
     silver_dim_seller.run()
     silver_dim_seller.read().curr_data.show(10)
-    
+
     print("=================================")
     print("Running Silver fct_orders ETL")
     print("=================================")
     silver_fct_orders = FactOrdersSilverETL(spark=spark)
     silver_fct_orders.run()
     silver_fct_orders.read().curr_data.show(10)
+    """
     print("=================================")
     print("Running Gold wide_orders ETL")
     print("=================================")
     gold_wide_orders = WideOrdersGoldETL(spark=spark)
     gold_wide_orders.run()
-    gold_wide_orders.read().curr_data.show(10)
-    """
+    gold_wide_orders.read().curr_data.show()
+
 
 
 if __name__ == "__main__":
