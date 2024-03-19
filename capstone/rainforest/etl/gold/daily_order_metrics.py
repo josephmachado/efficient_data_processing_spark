@@ -86,7 +86,7 @@ class DailyOrderMetricsGoldETL(TableETL):
 
         # Select the desired columns
         selected_columns = [
-            col('order_ts'), 
+            col('order_date'), 
             col('total_price_sum'), 
             col('total_price_mean'), 
             col('etl_inserted')
