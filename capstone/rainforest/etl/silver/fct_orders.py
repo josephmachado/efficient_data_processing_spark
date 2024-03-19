@@ -91,7 +91,7 @@ class FactOrdersSilverETL(TableETL):
         orders_data = orders_data.select(
             col("order_id"),
             col("buyer_id"),
-            col("order_date"),
+            col("order_ts"),
             col("total_price"),
             col("total_price_usd"),
             col("total_price_inr"),

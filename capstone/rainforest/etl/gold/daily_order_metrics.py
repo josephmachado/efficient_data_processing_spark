@@ -1,6 +1,6 @@
 from datetime import datetime
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, lit, sum as spark_sum, mean as spark_mean
+from pyspark.sql.functions import col, lit, sum as spark_sum, mean as spark_mean, date_format, to_date
 from typing import List, Optional, Type
 from rainforest.utils.base_table import ETLDataSet, TableETL
 from rainforest.etl.gold.wide_orders import WideOrdersGoldETL
@@ -12,7 +12,7 @@ class DailyOrderMetricsGoldETL(TableETL):
         spark: SparkSession,
         upstream_table_names: Optional[List[Type[TableETL]]] = [WideOrdersGoldETL],
         name: str = "daily_order_metrics",
-        primary_keys: List[str] = ["order_date"],
+        primary_keys: List[str] = ["order_ts"],
         storage_path: str = "s3a://rainforest/delta/gold/daily_order_metrics",
         data_format: str = "delta",
         database: str = "rainforest",
@@ -41,11 +41,12 @@ class DailyOrderMetricsGoldETL(TableETL):
 
     def transform_upstream(self, upstream_datasets: List[ETLDataSet]) -> ETLDataSet:
         wide_orders_data = upstream_datasets[0].curr_data
+        wide_orders_data = wide_orders_data.withColumn("order_date", col("order_ts").cast("date"))
 
         # Filter out non-active users
         wide_orders_data = wide_orders_data.filter(col('is_active'))
 
-        # Group by order_date and calculate sum and mean of total_price
+        # Group by order_ts and calculate sum and mean of total_price
         daily_metrics_data = wide_orders_data.groupBy('order_date').agg(
             spark_sum('total_price').alias('total_price_sum'),
             spark_mean('total_price').alias('total_price_mean')
@@ -85,7 +86,7 @@ class DailyOrderMetricsGoldETL(TableETL):
 
         # Select the desired columns
         selected_columns = [
-            col('order_date'), 
+            col('order_ts'), 
             col('total_price_sum'), 
             col('total_price_mean'), 
             col('etl_inserted')

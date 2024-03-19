@@ -136,15 +136,15 @@ def generate_order_data(buyer_ids, num_orders, user_ids):
     orders = []
     for _ in range(num_orders):
         buyer_id = random.choice(buyer_ids)
-        order_date = fake.date_time_between(start_date="-1y", end_date="now")
+        order_ts = fake.date_time_between(start_date="-1y", end_date="now")
         total_price = round(random.uniform(10.0, 1000.0), 2)
-        created_ts = order_date
+        created_ts = order_ts
         last_updated_by =  random.choice(user_ids) if user_ids else None
         last_updated_ts = created_ts
         orders.append(
             (
                 buyer_id,
-                order_date,
+                order_ts,
                 total_price,
                 created_ts
             )
@@ -273,7 +273,7 @@ buyer_ids = [row[0] for row in cur.fetchall()]
 # Generate and insert order data
 num_orders = 5000
 order_data = generate_order_data(buyer_ids, num_orders, user_ids)
-insert_query = 'INSERT INTO orders (buyer_id, order_date, total_price, created_ts) VALUES %s'
+insert_query = 'INSERT INTO orders (buyer_id, order_ts, total_price, created_ts) VALUES %s'
 execute_values(cur, insert_query, order_data)
 conn.commit()
 

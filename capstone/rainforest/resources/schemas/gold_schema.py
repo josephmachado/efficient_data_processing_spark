@@ -11,7 +11,7 @@ def create_tables(spark, path="s3a://rainforest/delta", database: str = "rainfor
         CREATE TABLE {database}.obt_order_item (
             order_item_id INT,
             order_id INT,
-            order_date TIMESTAMP,
+            order_ts TIMESTAMP,
             total_price DECIMAL(10, 2),
             buyer_id INT,
             buyer_username STRING,
@@ -76,7 +76,7 @@ def create_tables(spark, path="s3a://rainforest/delta", database: str = "rainfor
             category_id INT,
             category_name STRING,
             order_id INT,
-            order_date TIMESTAMP,
+            order_ts TIMESTAMP,
             total_price DECIMAL(10, 2),
             timestamp TIMESTAMP,
             created_ts TIMESTAMP,

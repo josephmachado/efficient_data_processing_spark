@@ -86,7 +86,7 @@ class WideOrdersGoldETL(TableETL):
         selected_columns = [
             col('order_id'), 
             col('buyer_id'), 
-            col('order_date'), 
+            col('order_ts'), 
             col('total_price'), 
             col('total_price_usd'), 
             col('total_price_inr'), 

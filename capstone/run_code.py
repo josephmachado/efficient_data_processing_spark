@@ -6,6 +6,7 @@ from rainforest.etl.silver.dim_seller import DimSellerSilverETL
 from rainforest.etl.silver.fct_orders import FactOrdersSilverETL
 from rainforest.etl.gold.wide_orders import WideOrdersGoldETL
 from rainforest.etl.gold.daily_order_metrics import DailyOrderMetricsGoldETL
+from rainforest.etl.interface.daily_order_report import create_daily_order_report_view
 
 
 def run_code(spark):
@@ -58,7 +59,8 @@ def run_code(spark):
     print("=================================")
     gold_daily_order_metrics = DailyOrderMetricsGoldETL(spark=spark)
     gold_daily_order_metrics.run()
-    gold_daily_order_metrics.read().curr_data.show()
+    create_daily_order_report_view(gold_daily_order_metrics.read().curr_data)
+    spark.sql("select * from global_temp.daily_order_report").show()
     
 
 

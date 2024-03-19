@@ -60,7 +60,7 @@ class OrdersSilverETL(TableETL):
 
         # Rename columns in order_data to avoid conflicts
         order_data = order_data.selectExpr(
-            "order_id", "buyer_id", "order_date", "total_price", "created_ts"
+            "order_id", "buyer_id", "order_ts", "total_price", "created_ts"
         )
 
         transformed_data = order_data.withColumn("etl_inserted", lit(current_timestamp))
@@ -97,7 +97,7 @@ class OrdersSilverETL(TableETL):
         orders_data = orders_data.select(
             col("order_id"),
             col("buyer_id"),
-            col("order_date"),
+            col("order_ts"),
             col("total_price"),
             col("created_ts"),
             col("etl_inserted"),

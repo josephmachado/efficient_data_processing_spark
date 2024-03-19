@@ -144,7 +144,7 @@ def create_tables(spark, path="s3a://rainforest/delta", database: str = "rainfor
         CREATE TABLE {database}.fact_orders (
             order_id INT,
             buyer_id INT,
-            order_date TIMESTAMP,
+            order_ts TIMESTAMP,
             total_price DECIMAL(10, 2),
             created_ts TIMESTAMP,
             last_updated_by INT,
