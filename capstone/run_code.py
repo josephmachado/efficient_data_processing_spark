@@ -59,7 +59,7 @@ def run_code(spark):
     print("=================================")
     """
     gold_daily_order_metrics = DailyOrderMetricsGoldETL(spark=spark)
-    gold_daily_order_metrics.run()
+    gold_daily_order_metrics.run() 
     create_daily_order_report_view(gold_daily_order_metrics.read().curr_data)
     spark.sql("select * from global_temp.daily_order_report").show()
     
