@@ -39,7 +39,7 @@ class ProductCategoryBronzeETL(TableETL):
             "password": "sdepassword",
             "driver": "org.postgresql.Driver",
         }
-        table_name = "rainforest.product_category"
+        table_name = "rainforest.productcategory"
         product_category_data = self.spark.read.jdbc(
             url=jdbc_url, table=table_name, properties=connection_properties
         )

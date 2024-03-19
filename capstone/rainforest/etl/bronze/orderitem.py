@@ -39,7 +39,7 @@ class OrderItemBronzeETL(TableETL):
             "password": "sdepassword",
             "driver": "org.postgresql.Driver",
         }
-        table_name = "rainforest.order_item"
+        table_name = "rainforest.orderitem"
         order_item_data = self.spark.read.jdbc(
             url=jdbc_url, table=table_name, properties=connection_properties
         )

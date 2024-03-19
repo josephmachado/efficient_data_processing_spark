@@ -57,12 +57,49 @@ def run_code(spark):
     print("=================================")
     print("Running Gold dail_order_metrics ETL")
     print("=================================")
+    
+    from rainforest.etl.silver.dim_buyer import DimBuyerSilverETL
+
+    print("=================================")
+    print("Running Silver dim_buyer ETL")
+    print("=================================")
+    silver_dim_buyer = DimBuyerSilverETL(spark=spark)
+    silver_dim_buyer.run()
+    silver_dim_buyer.read().curr_data.show(10)
+
+    from rainforest.etl.silver.dim_category import DimCategorySilverETL
+
+    print("=================================")
+    print("Running Silver dim_category ETL")
+    print("=================================")
+    silver_dim_category = DimCategorySilverETL(spark=spark)
+    silver_dim_category.run()
+    silver_dim_category.read().curr_data.show(10)
+
+    from rainforest.etl.silver.seller_x_product import SellerProductSilverETL
+
+    print("=================================")
+    print("Running Silver seller_x_product ETL")
+    print("=================================")
+    silver_seller_x_product = SellerProductSilverETL(spark=spark)
+    silver_seller_x_product.run()
+    silver_seller_x_product.read().curr_data.show(10)
+    """
+    from rainforest.etl.silver.dim_product import DimProductSilverETL
+
+    print("=================================")
+    print("Running Silver dim_product ETL")
+    print("=================================")
+    silver_dim_product = DimProductSilverETL(spark=spark)
+    silver_dim_product.run()
+    silver_dim_product.read().curr_data.show(10)
+
     """
     gold_daily_order_metrics = DailyOrderMetricsGoldETL(spark=spark)
     gold_daily_order_metrics.run()
     create_daily_order_report_view(gold_daily_order_metrics.read().curr_data)
     spark.sql("select * from global_temp.daily_order_report").show()
-    
+    """
 
 
 if __name__ == "__main__":
