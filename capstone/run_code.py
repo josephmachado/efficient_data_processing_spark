@@ -7,6 +7,7 @@ from rainforest.etl.silver.fct_orders import FactOrdersSilverETL
 from rainforest.etl.gold.wide_orders import WideOrdersGoldETL
 from rainforest.etl.gold.daily_order_metrics import DailyOrderMetricsGoldETL
 from rainforest.etl.interface.daily_order_report import create_daily_order_report_view
+from rainforest.etl.interface.daily_category_report import create_daily_category_report_view
 
 
 def run_code(spark):
@@ -93,12 +94,6 @@ def run_code(spark):
     silver_dim_product = DimProductSilverETL(spark=spark)
     silver_dim_product.run()
     silver_dim_product.read().curr_data.show(10)
-
-    
-    gold_daily_order_metrics = DailyOrderMetricsGoldETL(spark=spark)
-    gold_daily_order_metrics.run()
-    create_daily_order_report_view(gold_daily_order_metrics.read().curr_data)
-    spark.sql("select * from global_temp.daily_order_report").show()
     
     from rainforest.etl.silver.product_x_category import ProductCategorySilverETL
 
@@ -121,12 +116,20 @@ def run_code(spark):
 
     from rainforest.etl.gold.daily_category_metrics import DailyCategoryMetricsGoldETL
     print("=================================")
-    print("Running daily cat metrics ETL")
+    print("Daily Category Report")
     print("=================================")
     daily_cat_metrics = DailyCategoryMetricsGoldETL(spark=spark)
     daily_cat_metrics.run()
-    daily_cat_metrics.read().curr_data.show(10)
+    create_daily_category_report_view(daily_cat_metrics.read().curr_data)
+    spark.sql("select * from global_temp.daily_category_report").show()
 
+    print("=================================")
+    print("Daily Order Report")
+    print("=================================")
+    gold_daily_order_metrics = DailyOrderMetricsGoldETL(spark=spark)
+    gold_daily_order_metrics.run()
+    create_daily_order_report_view(gold_daily_order_metrics.read().curr_data)
+    spark.sql("select * from global_temp.daily_order_report").show()
 
 if __name__ == "__main__":
     # Create a spark session

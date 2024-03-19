@@ -84,23 +84,22 @@ class DailyOrderMetricsGoldETL(TableETL):
     
     def read(self, partition_keys: Optional[List[str]] = None) -> ETLDataSet:
         # Read the transformed data from the Delta Lake table
-        daily_category_metrics_data = self.spark.read.format(self.data_format).load(self.storage_path)
+        daily_order_metrics_data = self.spark.read.format(self.data_format).load(self.storage_path)
 
         # Select the desired columns
         selected_columns = [
-            F.col('order_date'), 
-            F.col('category'),
-            F.col('mean_actual_price'), 
-            F.col('median_actual_price'), 
-            F.col('etl_inserted')
+            col('order_date'), 
+            col('total_price_sum'), 
+            col('total_price_mean'), 
+            col('etl_inserted')
         ]
 
-        daily_category_metrics_data = daily_category_metrics_data.select(selected_columns)
+        daily_order_metrics_data = daily_order_metrics_data.select(selected_columns)
 
         # Create an ETLDataSet instance
         etl_dataset = ETLDataSet(
             name=self.name,
-            curr_data=daily_category_metrics_data,
+            curr_data=daily_order_metrics_data,
             primary_keys=self.primary_keys,
             storage_path=self.storage_path,
             data_format=self.data_format,
@@ -109,4 +108,3 @@ class DailyOrderMetricsGoldETL(TableETL):
         )
 
         return etl_dataset
-
