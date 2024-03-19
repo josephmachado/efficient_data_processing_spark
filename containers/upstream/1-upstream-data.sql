@@ -42,16 +42,6 @@ CREATE TABLE Manufacturer (
     last_updated_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create Ratings table
-CREATE TABLE Ratings (
-    ratings_id SERIAL PRIMARY KEY,
-    product_id INT UNIQUE REFERENCES Product(product_id),
-    rating DECIMAL(3, 2),
-    created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_updated_by INT REFERENCES AppUser(user_id),
-    last_updated_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
 -- Create Product table
 CREATE TABLE Product (
     product_id SERIAL PRIMARY KEY,
@@ -60,7 +50,16 @@ CREATE TABLE Product (
     price DECIMAL(10, 2) NOT NULL,
     brand_id INT REFERENCES Brand(brand_id),
     manufacturer_id INT REFERENCES Manufacturer(manufacturer_id),
-    rating_id INT REFERENCES Ratings(ratings_id),
+    created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_updated_by INT REFERENCES AppUser(user_id),
+    last_updated_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create Ratings table
+CREATE TABLE Ratings (
+    ratings_id SERIAL PRIMARY KEY,
+    product_id INT REFERENCES Product(product_id),
+    rating DECIMAL(3, 2),
     created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_updated_by INT REFERENCES AppUser(user_id),
     last_updated_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP

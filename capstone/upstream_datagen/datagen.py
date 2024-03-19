@@ -204,6 +204,48 @@ def generate_clickstream_data(user_ids, product_ids, order_ids):
     return clickstreams
 
 
+def generate_brand_data(num_brands, user_ids):
+    """
+    Generate fake data for the Brand table.
+    """
+    brand_data = []
+    for _ in range(num_brands):
+        brand_name = fake.company()
+        country = fake.country()
+        created_ts = fake.date_time_between(start_date='-1y', end_date='now')
+        last_updated_by = random.choice(user_ids)
+        last_updated_ts = fake.date_time_between(start_date=created_ts, end_date='now')
+        brand_data.append((brand_name, country, created_ts, last_updated_by, last_updated_ts))
+    return brand_data
+
+def generate_manufacturer_data(num_manufacturers, user_ids):
+    """
+    Generate fake data for the Manufacturer table.
+    """
+    manufacturer_data = []
+    for _ in range(num_manufacturers):
+        manufacturer_name = fake.company()
+        manufacturer_type = fake.word()
+        created_ts = fake.date_time_between(start_date='-1y', end_date='now')
+        last_updated_by = random.choice(user_ids)
+        last_updated_ts = fake.date_time_between(start_date=created_ts, end_date='now')
+        manufacturer_data.append((manufacturer_name, manufacturer_type, created_ts, last_updated_by, last_updated_ts))
+    return manufacturer_data
+
+def generate_ratings_data(num_ratings, product_ids, user_ids):
+    """
+    Generate fake data for the Ratings table.
+    """
+    ratings_data = []
+    for _ in range(num_ratings):
+        product_id = random.choice(product_ids)
+        rating = round(random.uniform(0, 5), 2)
+        created_ts = fake.date_time_between(start_date='-1y', end_date='now')
+        last_updated_by = random.choice(user_ids)
+        last_updated_ts = fake.date_time_between(start_date=created_ts, end_date='now')
+        ratings_data.append((product_id, rating, created_ts, last_updated_by, last_updated_ts))
+    return ratings_data
+
 # Generate and insert data into tables
 num_users = 1000
 num_products = 500
@@ -217,6 +259,19 @@ conn.commit()
 # Get user IDs for other tables
 cur.execute('SELECT user_id FROM AppUser')
 user_ids = [row[0] for row in cur.fetchall()]
+
+num_brands = 50
+brand_data = generate_brand_data(num_brands, user_ids)
+insert_query = 'INSERT INTO Brand (name, country, created_ts, last_updated_by, last_updated_ts) VALUES %s'
+execute_values(cur, insert_query, brand_data)
+conn.commit()
+
+num_manufacturers = 50
+manufacturer_data = generate_manufacturer_data(num_manufacturers, user_ids)
+insert_query = 'INSERT INTO Manufacturer (name, type, created_ts, last_updated_by, last_updated_ts) VALUES %s'
+execute_values(cur, insert_query, manufacturer_data)
+conn.commit()
+
 
 # Generate and insert seller data
 seller_data = generate_seller_data(user_ids)
@@ -242,6 +297,13 @@ cur.execute("SELECT seller_id FROM Seller")
 seller_ids = [row[0] for row in cur.fetchall()]
 cur.execute("SELECT product_id FROM Product")
 product_ids = [row[0] for row in cur.fetchall()]
+
+# Assuming you have product_ids and user_ids generated for the products and users
+num_ratings = 1000  # Example: generate 1000 ratings
+ratings_data = generate_ratings_data(num_ratings, product_ids, user_ids)
+insert_query = "INSERT INTO Ratings (product_id, rating, created_ts, last_updated_by, last_updated_ts) VALUES %s"
+execute_values(cur, insert_query, ratings_data)
+conn.commit()
 
 # Generate and insert seller_product data
 seller_product_data = generate_seller_product_data(seller_ids, product_ids)
