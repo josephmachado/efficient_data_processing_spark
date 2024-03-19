@@ -32,6 +32,7 @@ class TableETL(ABC):
         data_format: str,
         database: str,
         partition_keys: List[str],
+        run_upstream: bool = True,
     ) -> None:
         self.spark = spark
         self.upstream_table_names = upstream_table_names
@@ -41,10 +42,10 @@ class TableETL(ABC):
         self.data_format = data_format
         self.database = database
         self.partition_keys = partition_keys
-        pass
+        self.run_upstream = run_upstream
 
     @abstractmethod
-    def extract_upstream(self, run_upstream: bool = True) -> List[ETLDataSet]:
+    def extract_upstream(self) -> List[ETLDataSet]:
         pass
 
     @abstractmethod
@@ -59,8 +60,8 @@ class TableETL(ABC):
     def load(self, data: ETLDataSet) -> None:
         pass
 
-    def run(self, run_upstream: bool = True) -> None:
-        transformed_data = self.transform_upstream(self.extract_upstream(run_upstream))
+    def run(self) -> None:
+        transformed_data = self.transform_upstream(self.extract_upstream())
         self.validate(transformed_data)
         self.load(transformed_data)
 

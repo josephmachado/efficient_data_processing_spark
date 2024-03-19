@@ -18,7 +18,8 @@ class DimSellerSilverETL(TableETL):
         storage_path: str = "s3a://rainforest/delta/silver/dim_seller",
         data_format: str = "delta",
         database: str = "rainforest",
-        partition_keys: List[str] = ["etl_inserted"]
+        partition_keys: List[str] = ["etl_inserted"],
+        run_upstream: bool = True,
     ) -> None:
         super().__init__(
             spark,
@@ -29,13 +30,14 @@ class DimSellerSilverETL(TableETL):
             data_format,
             database,
             partition_keys,
+            run_upstream,
         )
 
-    def extract_upstream(self, run_upstream: bool = True) -> List[ETLDataSet]:
+    def extract_upstream(self) -> List[ETLDataSet]:
         upstream_etl_datasets = []
         for TableETL in self.upstream_table_names:
             t1 = TableETL(spark=self.spark)
-            if run_upstream:
+            if self.run_upstream:
                 t1.run()
             upstream_etl_datasets.append(t1.read())
         

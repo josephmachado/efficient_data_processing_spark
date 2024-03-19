@@ -17,6 +17,7 @@ class OrdersSilverETL(TableETL):
         data_format: str = "delta",
         database: str = "rainforest",
         partition_keys: List[str] = ["etl_inserted"],
+        run_upstream: bool = True,
     ) -> None:
         super().__init__(
             spark,
@@ -27,9 +28,10 @@ class OrdersSilverETL(TableETL):
             data_format,
             database,
             partition_keys,
+            run_upstream,
         )
 
-    def extract_upstream(self, run_upstream: bool = True) -> List[ETLDataSet]:
+    def extract_upstream(self) -> List[ETLDataSet]:
         jdbc_url = "jdbc:postgresql://metadata:5432/metadatadb"
         connection_properties = {
             "user": "sdeuser",

@@ -17,6 +17,7 @@ class SellerBronzeETL(TableETL):
         data_format: str = "delta",
         database: str = "rainforest",
         partition_keys: List[str] = ["etl_inserted"],
+        run_upstream: bool = True,
     ) -> None:
         super().__init__(
             spark,
@@ -27,9 +28,10 @@ class SellerBronzeETL(TableETL):
             data_format,
             database,
             partition_keys,
+            run_upstream
         )
 
-    def extract_upstream(self, run_upstream: bool = True) -> List[ETLDataSet]:
+    def extract_upstream(self) -> List[ETLDataSet]:
         # Assuming seller data is extracted from a database or other source
         # and loaded into a DataFrame
         jdbc_url = "jdbc:postgresql://metadata:5432/metadatadb"
