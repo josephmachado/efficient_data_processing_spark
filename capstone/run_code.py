@@ -5,6 +5,7 @@ from rainforest.etl.bronze.orders import OrdersSilverETL
 from rainforest.etl.silver.dim_seller import DimSellerSilverETL
 from rainforest.etl.silver.fct_orders import FactOrdersSilverETL
 from rainforest.etl.gold.wide_orders import WideOrdersGoldETL
+from rainforest.etl.gold.daily_order_metrics import DailyOrderMetricsGoldETL
 
 
 def run_code(spark):
@@ -44,14 +45,21 @@ def run_code(spark):
     silver_fct_orders = FactOrdersSilverETL(spark=spark)
     silver_fct_orders.run()
     silver_fct_orders.read().curr_data.show(10)
-    """
+    
     print("=================================")
     print("Running Gold wide_orders ETL")
     print("=================================")
     gold_wide_orders = WideOrdersGoldETL(spark=spark)
     gold_wide_orders.run()
     gold_wide_orders.read().curr_data.show()
-
+    """
+    print("=================================")
+    print("Running Gold dail_order_metrics ETL")
+    print("=================================")
+    gold_daily_order_metrics = DailyOrderMetricsGoldETL(spark=spark)
+    gold_daily_order_metrics.run()
+    gold_daily_order_metrics.read().curr_data.show()
+    
 
 
 if __name__ == "__main__":
