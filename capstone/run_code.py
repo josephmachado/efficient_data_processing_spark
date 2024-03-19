@@ -53,10 +53,11 @@ def run_code(spark):
     gold_wide_orders = WideOrdersGoldETL(spark=spark)
     gold_wide_orders.run()
     gold_wide_orders.read().curr_data.show()
-    """
+    
     print("=================================")
     print("Running Gold dail_order_metrics ETL")
     print("=================================")
+    """
     gold_daily_order_metrics = DailyOrderMetricsGoldETL(spark=spark)
     gold_daily_order_metrics.run()
     create_daily_order_report_view(gold_daily_order_metrics.read().curr_data)
