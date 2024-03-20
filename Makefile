@@ -55,3 +55,6 @@ hserver-ui:
 
 ui:
 	open http://localhost:4040
+
+cr: 
+	@read -p "Enter pyspark relative path:" pyspark_path; docker exec -ti local-spark bash -c '$$SPARK_HOME/bin/spark-submit --master local[*] $$SPARK_HOME/work-dir/'$$pyspark_path

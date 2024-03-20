@@ -85,7 +85,7 @@ FROM
 LIMIT
     10;
 
--- 1512555, 6001215
+-- 1512555, 6001215 -- Some log, but results still show
 SELECT
     COUNT(o.orderkey) AS order_rows_count,
     COUNT(l.orderkey) AS lineitem_rows_count
