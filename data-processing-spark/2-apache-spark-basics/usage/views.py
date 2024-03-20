@@ -47,7 +47,8 @@ def run_code(spark):
             purchased_items_quantity["quantity"].alias("purchased_items_quantity"),
         )
     )
-    nation_supplied_purchased_quantity.show()
+    nation_supplied_purchased_quantity.createOrReplaceTempView("nation_supplied_purchased_quantity")
+    spark.sql("SELECT * FROM nation_supplied_purchased_quantity").show()
 
 if __name__ == '__main__':
     spark = (
