@@ -3,15 +3,15 @@ FROM deltaio/delta-docker:latest
 
 USER root
 
-COPY ./containers/spark/requirements.txt ./
+COPY ./requirements.txt ./
 RUN pip install -r requirements.txt
 
 # Copy SQL DDL and DML to SPARK_HOME dir
-COPY ./containers/spark/setup.sql ./
-COPY ./containers/spark/count.sql ./
+COPY ./setup.sql ./
+COPY ./count.sql ./
 
 # Copy tpch data generator into the container
-COPY ./containers/spark/tpch-dbgen ./tpch-dbgen/
+COPY ./tpch-dbgen ./tpch-dbgen/
 
 # Create and event logging directory to store job logs
 RUN mkdir /tmp/spark-events

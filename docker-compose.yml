@@ -5,8 +5,8 @@ services:
     image: local-spark
     container_name: local-spark
     build:
-      context: ./
-      dockerfile: ./containers/spark/Dockerfile
+      context: ./data-processing-spark/lab-setup/containers/spark
+      dockerfile: Dockerfile
     environment:
       METADATA_DRIVERNAME: postgresql
       METADATA_HOST: metadata
@@ -44,7 +44,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./containers/upstream/1-upstream-data.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./data-processing-spark/lab-setup/containers/upstream/1-upstream-data.sql:/docker-entrypoint-initdb.d/init.sql
 
   createbuckets:
     image: minio/mc
