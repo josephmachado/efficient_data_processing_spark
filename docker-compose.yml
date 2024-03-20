@@ -6,7 +6,7 @@ services:
     container_name: local-spark
     build:
       context: ./data-processing-spark/lab-setup/containers/spark
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile 
     environment:
       METADATA_DRIVERNAME: postgresql
       METADATA_HOST: metadata
