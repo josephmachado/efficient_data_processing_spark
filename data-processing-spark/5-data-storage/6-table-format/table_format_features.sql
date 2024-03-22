@@ -100,4 +100,33 @@ DESCRIBE HISTORY delta_lineitem;
 -- Updates, Deletes and Merge into
 DELETE FROM delta_lineitem WHERE shipmode = 'TRUCK';
 UPDATE delta_lineitem SET shipmode = 'AIR' WHERE shipmode = 'REG AIR';
--- MERGE INTO / UPSERT INTO especially useful for dimension tables
+
+-- MERGE INTO / UPSERT INTO especially useful for dimension table updates and inserts but done at the same time
+-- let's use nation table as an example
+
+CREATE TABLE delta_nation (
+    nationkey Long,
+    name STRING,
+    regionkey Long,
+    COMMENT STRING
+) USING DELTA LOCATION 's3a://tpch/delta_nation/' 
+TBLPROPERTIES (
+   'delta.columnMapping.mode' = 'name',
+   'delta.minReaderVersion' = '2',
+   'delta.minWriterVersion' = '5');
+
+INSERT INTO delta_nation
+SELECT nationkey
+, name
+, regionkey
+, COMMENT
+FROM nation;
+
+
+MERGE INTO delta_nation
+USING nation
+on delta_nation.nationkey = nation.nationkey
+WHEN MATCHED THEN UPDATE SET 
+delta_nation.name = CONCAT(nation.name, '_', 'NEW_NATION');
+
+SELECT DISTINCT name FROM delta_nation;
