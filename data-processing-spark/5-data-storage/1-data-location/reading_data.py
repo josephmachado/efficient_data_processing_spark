@@ -18,7 +18,7 @@ def run_code(spark):
     print("Get the local file location for our orders table")
     spark.sql("DESCRIBE EXTENDED tpch.orders").show(n=100,truncate=False)
     print("Serialized orders data")
-    spark.read.csv("file:/opt/spark/work-dir/spark-warehouse/tpch.db/orders").show()
+    spark.read.csv("s3a://tpch/orders").show()
 
 if __name__ == '__main__':
     spark = (

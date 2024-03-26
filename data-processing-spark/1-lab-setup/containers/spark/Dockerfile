@@ -19,14 +19,21 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-COPY .//conf/spark-defaults.conf "$SPARK_HOME/conf/spark-defaults.conf"
+COPY ./conf/spark-defaults.conf "$SPARK_HOME/conf/spark-defaults.conf"
 ENV SPARK_CONF_DIR="$SPARK_HOME/conf"
+ENV SPARK_MASTER="spark://spark-master:7077"
+ENV SPARK_MASTER_HOST spark-master
+ENV SPARK_MASTER_PORT 7077
+ENV PYSPARK_PYTHON python3
 
 # Create and event logging directory to store job logs
 RUN mkdir /tmp/spark-events
 
-# Create the log file to be able to run tail
-RUN touch /var/log/cron.log
+RUN chmod u+x /opt/spark/sbin/* && \
+    chmod u+x /opt/spark/bin/*
 
-# Run cron
-ENTRYPOINT ["tail", "-f", "/dev/null"]
+ENV PYTHONPATH=$SPARK_HOME/python/:$PYTHONPATH
+
+COPY entrypoint.sh .
+
+ENTRYPOINT ["./entrypoint.sh"]

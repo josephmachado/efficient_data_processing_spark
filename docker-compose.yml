@@ -1,9 +1,10 @@
 version: '3'
 
 services:
-  local-spark:
-    image: local-spark
-    container_name: local-spark
+  spark-master:
+    image: spark-image
+    container_name: spark-master
+    entrypoint: ['./entrypoint.sh', 'master']
     build:
       context: ./data-processing-spark/1-lab-setup/containers/spark
       dockerfile: Dockerfile 
@@ -14,15 +15,52 @@ services:
       METADATA_USERNAME: sdeuser
       METADATA_PASSWORD: sdepassword
       METADATA_DATABASE: metadatadb
-    hostname: localhost
     ports:
       - "4040:4040"
-      - "18080:18080"
+      - "9090:8080"
+      - "7077:7077"
     volumes:
       - ./adventureworks:/opt/spark/work-dir/adventureworks
       - ./capstone:/opt/spark/work-dir/capstone
       - ./data-processing-spark:/opt/spark/work-dir/data-processing-spark
-
+      - spark-logs:/opt/spark/spark-events
+      - tpch-data:/opt/spark/tpch-dbgen
+    env_file:
+      - .env.spark
+  
+  spark-history-server:
+    container_name: spark-history
+    image: spark-image
+    entrypoint: ['./entrypoint.sh', 'history']
+    depends_on:
+      - spark-master
+    env_file:
+      - .env.spark
+    volumes:
+      - spark-logs:/opt/spark/spark-events
+    ports:
+      - '18080:18080'
+  
+  spark-worker:
+    image: spark-image
+    # container_name: spark-master
+    entrypoint: ['./entrypoint.sh', 'worker']
+    environment:
+      METADATA_DRIVERNAME: postgresql
+      METADATA_HOST: metadata
+      METADATA_PORT: '5432'
+      METADATA_USERNAME: sdeuser
+      METADATA_PASSWORD: sdepassword
+      METADATA_DATABASE: metadatadb
+    volumes:
+      - ./adventureworks:/opt/spark/work-dir/adventureworks
+      - ./capstone:/opt/spark/work-dir/capstone
+      - ./data-processing-spark:/opt/spark/work-dir/data-processing-spark
+      - spark-logs:/opt/spark/spark-events
+      - tpch-data:/opt/spark/tpch-dbgen
+    env_file:
+      - .env.spark
+  
   minio:
     image: 'minio/minio:RELEASE.2023-07-21T21-12-44Z'
     hostname: minio
@@ -54,3 +92,8 @@ services:
       - minio
     entrypoint: >
       /bin/sh -c " /usr/bin/mc config host add myminio http://minio:9000 minio minio123; /usr/bin/mc rm -r --force myminio/tpch; /usr/bin/mc mb myminio/tpch; /usr/bin/mc policy download myminio/tpch; /usr/bin/mc rm -r --force myminio/rainforest; /usr/bin/mc mb myminio/rainforest; /usr/bin/mc policy download myminio/rainforest; exit 0; "
+
+
+volumes:
+  spark-logs:
+  tpch-data:
