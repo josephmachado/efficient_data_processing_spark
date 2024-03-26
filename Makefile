@@ -48,7 +48,7 @@ run-code:
 hserver:
 	docker exec -ti local-spark bash -c '$$SPARK_HOME/sbin/start-history-server.sh'
 
-setup: datagen create-tables hserver
+setup: datagen fake-datagen create-tables hserver
 
 hserver-ui:
 	open http://localhost:18080
