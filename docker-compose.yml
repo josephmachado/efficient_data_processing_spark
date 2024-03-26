@@ -8,19 +8,11 @@ services:
     build:
       context: ./data-processing-spark/1-lab-setup/containers/spark
       dockerfile: Dockerfile 
-    environment:
-      METADATA_DRIVERNAME: postgresql
-      METADATA_HOST: metadata
-      METADATA_PORT: '5432'
-      METADATA_USERNAME: sdeuser
-      METADATA_PASSWORD: sdepassword
-      METADATA_DATABASE: metadatadb
     ports:
       - "4040:4040"
       - "9090:8080"
       - "7077:7077"
     volumes:
-      - ./adventureworks:/opt/spark/work-dir/adventureworks
       - ./capstone:/opt/spark/work-dir/capstone
       - ./data-processing-spark:/opt/spark/work-dir/data-processing-spark
       - spark-logs:/opt/spark/spark-events
@@ -43,17 +35,8 @@ services:
   
   spark-worker:
     image: spark-image
-    # container_name: spark-master
     entrypoint: ['./entrypoint.sh', 'worker']
-    environment:
-      METADATA_DRIVERNAME: postgresql
-      METADATA_HOST: metadata
-      METADATA_PORT: '5432'
-      METADATA_USERNAME: sdeuser
-      METADATA_PASSWORD: sdepassword
-      METADATA_DATABASE: metadatadb
     volumes:
-      - ./adventureworks:/opt/spark/work-dir/adventureworks
       - ./capstone:/opt/spark/work-dir/capstone
       - ./data-processing-spark:/opt/spark/work-dir/data-processing-spark
       - spark-logs:/opt/spark/spark-events
@@ -73,13 +56,13 @@ services:
       MINIO_SECRET_KEY: minio123
     command: server --console-address ":9001" /data
 
-  metadata:
+  upstream:
     image: postgres:15
-    container_name: metadata
+    container_name: upstream
     environment:
       POSTGRES_USER: sdeuser
       POSTGRES_PASSWORD: sdepassword
-      POSTGRES_DB: metadatadb
+      POSTGRES_DB: upstreamdb
     ports:
       - "5432:5432"
     volumes:

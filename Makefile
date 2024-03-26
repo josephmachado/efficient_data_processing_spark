@@ -10,7 +10,7 @@ sh:
 	docker exec -ti spark-master bash
 
 meta:
-	PGPASSWORD=sdepassword pgcli -h localhost -p 5432 -U sdeuser -d metadatadb
+	PGPASSWORD=sdepassword pgcli -h localhost -p 5432 -U sdeuser -d upstreamdb
 
 fake-datagen:
 	python3 capstone/upstream_datagen/datagen.py
@@ -30,7 +30,7 @@ create-tables:
 count-tables:
 	docker exec spark-master spark-sql --master spark://spark-master:7077 --deploy-mode client -f ./count.sql
 
-run-code:
+rainforest:
 	docker exec spark-master spark-submit --master spark://spark-master:7077 --deploy-mode client ./capstone/run_code.py
 
 setup: datagen fake-datagen create-tables 

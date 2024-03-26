@@ -6,7 +6,7 @@ import random
 
 # Connect to PostgreSQL database
 conn = psycopg2.connect(
-    dbname="metadatadb",
+    dbname="upstreamdb",
     user="sdeuser",
     password="sdepassword",
     host="localhost",

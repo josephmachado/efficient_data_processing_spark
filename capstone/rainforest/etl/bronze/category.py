@@ -33,7 +33,7 @@ class CategoryBronzeETL(TableETL):
     def extract_upstream(self) -> List[ETLDataSet]:
         # Assuming category data is extracted from a database or other source
         # and loaded into a DataFrame
-        jdbc_url = "jdbc:postgresql://metadata:5432/metadatadb"
+        jdbc_url = "jdbc:postgresql://upstream:5432/upstreamdb"
         connection_properties = {
             "user": "sdeuser",
             "password": "sdepassword",
