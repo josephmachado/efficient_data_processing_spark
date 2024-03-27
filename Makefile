@@ -71,10 +71,10 @@ format:
 	docker exec spark-master isort ./data-processing-spark ./capstone
 
 type:
-	docker exec -ti spark-master bash -c 'python3 -m mypy --no-implicit-reexport --ignore-missing-imports --no-namespace-packages ./data-processing-spark ./capstone'
+	docker exec spark-master mypy --no-implicit-reexport --ignore-missing-imports --no-namespace-packages ./data-processing-spark ./capstone
 
 lint:
-	docker exec -ti spark-master bash -c 'flake8 ./data-processing-spark'
-	docker exec -ti spark-master bash -c 'flake8 ./capstone'
+	docker exec spark-master flake8 ./data-processing-spark
+	docker exec spark-master flake8 ./capstone
 
 ci: format type lint 
