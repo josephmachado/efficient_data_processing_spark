@@ -30,7 +30,7 @@ We have some helpful **make** commands for working with our systems. Shown below
 6. `make rainforest`: Runs our rainforest capstone project, the entry point for this code is [here](./capstone/run_code.py)
 
 This is how you run pyspark exercise files:
-![make cr example](./assets/make_cr.webm)
+![make cr example](./assets/make_cr.gif)
 
 You can see the commands in <u>[this Makefile](https://github.com/josephmachado/efficient_data_processing_spark/blob/main/Makefile)</u>. If your terminal does not support **make** commands, please use the commands in <u>[the Makefile](https://github.com/josephmachado/efficient_data_processing_spark/blob/main/Makefile)</u> directly. All the commands in this book assume that you have the docker containers running.
 
