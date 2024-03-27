@@ -71,7 +71,7 @@ format:
 	docker exec -ti spark-master bash -c 'isort ./data-processing-spark ./capstone'
 
 type:
-	docker exec -ti spark-master bash -c 'python3 -m mypy --no-implicit-reexport --ignore-missing-imports --no-namespace-packages ./adventureworks'
+	docker exec -ti spark-master bash -c 'python3 -m mypy --no-implicit-reexport --ignore-missing-imports --no-namespace-packages ./data-processing-spark ./capstone'
 
 lint:
 	docker exec -ti spark-master bash -c 'flake8 ./data-processing-spark'
