@@ -4,6 +4,7 @@ from typing import List, Optional, Type
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, lit
 from rainforest.utils.base_table import ETLDataSet, TableETL
+from rainforest.utils.db import get_upstream_table
 
 
 class RatingsBronzeETL(TableETL):
@@ -34,16 +35,9 @@ class RatingsBronzeETL(TableETL):
     def extract_upstream(self) -> List[ETLDataSet]:
         # Assuming ratings data is extracted from a database or other source
         # and loaded into a DataFrame
-        jdbc_url = "jdbc:postgresql://upstream:5432/upstreamdb"
-        connection_properties = {
-            "user": "sdeuser",
-            "password": "sdepassword",
-            "driver": "org.postgresql.Driver",
-        }
+        
         table_name = "rainforest.ratings"
-        ratings_data = self.spark.read.jdbc(
-            url=jdbc_url, table=table_name, properties=connection_properties
-        )
+        ratings_data = get_upstream_table(table_name, self.spark)
 
         # Create an ETLDataSet instance
         etl_dataset = ETLDataSet(
