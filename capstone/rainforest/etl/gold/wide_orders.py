@@ -94,17 +94,27 @@ class WideOrdersGoldETL(TableETL):
             data.storage_path
         )
 
-    def read(self, partition_values: Optional[Dict[str, str]] = None) -> ETLDataSet:
+    def read(
+        self, partition_values: Optional[Dict[str, str]] = None
+    ) -> ETLDataSet:
         if partition_values:
-            partition_filter = " AND ".join([f"{k} = '{v}'" for k, v in partition_values.items()])
+            partition_filter = " AND ".join(
+                [f"{k} = '{v}'" for k, v in partition_values.items()]
+            )
         else:
-            latest_partition = self.spark.read.format(self.data_format).load(
-            self.storage_path).selectExpr("max(etl_inserted)").collect()[0][0]
+            latest_partition = (
+                self.spark.read.format(self.data_format)
+                .load(self.storage_path)
+                .selectExpr("max(etl_inserted)")
+                .collect()[0][0]
+            )
             partition_filter = f"etl_inserted = '{latest_partition}'"
         # Read the transformed data from the Delta Lake table
-        wide_orders_data = self.spark.read.format(self.data_format).load(
-            self.storage_path
-        ).filter(partition_filter)
+        wide_orders_data = (
+            self.spark.read.format(self.data_format)
+            .load(self.storage_path)
+            .filter(partition_filter)
+        )
 
         # Select the desired columns
         selected_columns = [

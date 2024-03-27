@@ -66,5 +66,7 @@ class TableETL(ABC):
         self.load(transformed_data)
 
     @abstractmethod
-    def read(self, partition_values: Optional[Dict[str, str]] = None) -> ETLDataSet:
+    def read(
+        self, partition_values: Optional[Dict[str, str]] = None
+    ) -> ETLDataSet:
         pass

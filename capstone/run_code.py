@@ -1,11 +1,11 @@
 from pyspark.sql import SparkSession
+from rainforest.etl.gold.daily_category_metrics import \
+    DailyCategoryMetricsGoldETL
 from rainforest.etl.gold.daily_order_metrics import DailyOrderMetricsGoldETL
 from rainforest.etl.interface.daily_category_report import \
     create_daily_category_report_view
 from rainforest.etl.interface.daily_order_report import \
     create_daily_order_report_view
-from rainforest.etl.gold.daily_category_metrics import \
-        DailyCategoryMetricsGoldETL
 
 
 def run_code(spark):

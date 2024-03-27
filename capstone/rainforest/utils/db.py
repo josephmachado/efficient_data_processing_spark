@@ -1,5 +1,7 @@
 import os
+
 from pyspark.sql import SparkSession
+
 
 def get_upstream_table(table_name: str, spark: SparkSession):
     host = os.getenv("UPSTREAM_HOST", "upstream")

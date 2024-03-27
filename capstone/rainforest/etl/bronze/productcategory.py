@@ -36,7 +36,7 @@ class ProductCategoryBronzeETL(TableETL):
         # Assuming product category data is extracted
         # from a database or other source
         # and loaded into a DataFrame
-        
+
         table_name = "rainforest.productcategory"
         product_category_data = get_upstream_table(table_name, self.spark)
 
@@ -89,17 +89,27 @@ class ProductCategoryBronzeETL(TableETL):
             "overwrite"
         ).partitionBy(data.partition_keys).save(data.storage_path)
 
-    def read(self, partition_values: Optional[Dict[str, str]] = None) -> ETLDataSet:
+    def read(
+        self, partition_values: Optional[Dict[str, str]] = None
+    ) -> ETLDataSet:
         if partition_values:
-            partition_filter = " AND ".join([f"{k} = '{v}'" for k, v in partition_values.items()])
+            partition_filter = " AND ".join(
+                [f"{k} = '{v}'" for k, v in partition_values.items()]
+            )
         else:
-            latest_partition = self.spark.read.format(self.data_format).load(
-            self.storage_path).selectExpr("max(etl_inserted)").collect()[0][0]
+            latest_partition = (
+                self.spark.read.format(self.data_format)
+                .load(self.storage_path)
+                .selectExpr("max(etl_inserted)")
+                .collect()[0][0]
+            )
             partition_filter = f"etl_inserted = '{latest_partition}'"
         # Read the product category data from the Delta Lake table
-        product_category_data = self.spark.read.format(self.data_format).load(
-            self.storage_path
-        ).filter(partition_filter)
+        product_category_data = (
+            self.spark.read.format(self.data_format)
+            .load(self.storage_path)
+            .filter(partition_filter)
+        )
         # Explicitly select columns
         product_category_data = product_category_data.select(
             col("product_id"),

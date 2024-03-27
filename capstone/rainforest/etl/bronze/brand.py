@@ -36,7 +36,9 @@ class BrandBronzeETL(TableETL):
         # Assuming brand data is extracted from a database or other source
         # and loaded into a DataFrame
         table_name = "rainforest.brand"
-        brand_data = get_upstream_table(table_name=table_name, spark=self.spark)
+        brand_data = get_upstream_table(
+            table_name=table_name, spark=self.spark
+        )
 
         # Create an ETLDataSet instance
         etl_dataset = ETLDataSet(
@@ -87,17 +89,27 @@ class BrandBronzeETL(TableETL):
             "overwrite"
         ).partitionBy(data.partition_keys).save(data.storage_path)
 
-    def read(self, partition_values: Optional[Dict[str, str]] = None) -> ETLDataSet:
+    def read(
+        self, partition_values: Optional[Dict[str, str]] = None
+    ) -> ETLDataSet:
         if partition_values:
-            partition_filter = " AND ".join([f"{k} = '{v}'" for k, v in partition_values.items()])
+            partition_filter = " AND ".join(
+                [f"{k} = '{v}'" for k, v in partition_values.items()]
+            )
         else:
-            latest_partition = self.spark.read.format(self.data_format).load(
-            self.storage_path).selectExpr("max(etl_inserted)").collect()[0][0]
+            latest_partition = (
+                self.spark.read.format(self.data_format)
+                .load(self.storage_path)
+                .selectExpr("max(etl_inserted)")
+                .collect()[0][0]
+            )
             partition_filter = f"etl_inserted = '{latest_partition}'"
         # Read the brand data from the Delta Lake table
-        brand_data = self.spark.read.format(self.data_format).load(
-            self.storage_path
-        ).filter(partition_filter)
+        brand_data = (
+            self.spark.read.format(self.data_format)
+            .load(self.storage_path)
+            .filter(partition_filter)
+        )
         # Explicitly select columns
         brand_data = brand_data.select(
             col("brand_id"),

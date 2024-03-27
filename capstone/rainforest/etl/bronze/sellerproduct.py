@@ -6,6 +6,7 @@ from pyspark.sql.functions import col, lit
 from rainforest.utils.base_table import ETLDataSet, TableETL
 from rainforest.utils.db import get_upstream_table
 
+
 class SellerProductBronzeETL(TableETL):
     def __init__(
         self,
@@ -35,7 +36,7 @@ class SellerProductBronzeETL(TableETL):
         # Assuming seller product data is extracted from
         # a database or other source
         # and loaded into a DataFrame
-        
+
         table_name = "rainforest.sellerproduct"
         seller_product_data = get_upstream_table(table_name, self.spark)
 
@@ -88,17 +89,27 @@ class SellerProductBronzeETL(TableETL):
             "overwrite"
         ).partitionBy(data.partition_keys).save(data.storage_path)
 
-    def read(self, partition_values: Optional[Dict[str, str]] = None) -> ETLDataSet:
+    def read(
+        self, partition_values: Optional[Dict[str, str]] = None
+    ) -> ETLDataSet:
         if partition_values:
-            partition_filter = " AND ".join([f"{k} = '{v}'" for k, v in partition_values.items()])
+            partition_filter = " AND ".join(
+                [f"{k} = '{v}'" for k, v in partition_values.items()]
+            )
         else:
-            latest_partition = self.spark.read.format(self.data_format).load(
-            self.storage_path).selectExpr("max(etl_inserted)").collect()[0][0]
+            latest_partition = (
+                self.spark.read.format(self.data_format)
+                .load(self.storage_path)
+                .selectExpr("max(etl_inserted)")
+                .collect()[0][0]
+            )
             partition_filter = f"etl_inserted = '{latest_partition}'"
         # Read the seller product data from the Delta Lake table
-        seller_product_data = self.spark.read.format(self.data_format).load(
-            self.storage_path
-        ).filter(partition_filter)
+        seller_product_data = (
+            self.spark.read.format(self.data_format)
+            .load(self.storage_path)
+            .filter(partition_filter)
+        )
         # Explicitly select columns
         seller_product_data = seller_product_data.select(
             col("seller_id"),
