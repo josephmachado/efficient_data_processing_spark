@@ -16,7 +16,7 @@ class DailyCategoryMetricsGoldETL(TableETL):
         ],
         name: str = "daily_category_metrics",
         primary_keys: List[str] = ["order_date", "category"],
-        storage_path: str = "s3a://rainforest/delta/gold/daily_category_metrics",
+        storage_path: str = "s3a://rainforest/delta/gold/daily_category_metrics",  # noqa
         data_format: str = "delta",
         database: str = "rainforest",
         partition_keys: List[str] = ["etl_inserted"],
