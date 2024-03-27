@@ -87,8 +87,8 @@ TABLE_SCHEMAS = {
 def create_ddl_dml_queries(tbl_schemas=TABLE_SCHEMAS):
     sql_template = Template(
         """
-    DROP TABLE IF EXISTS {{ table_name }}; 
-    
+    DROP TABLE IF EXISTS {{ table_name }};
+
     CREATE TABLE {{ table_name }} (
         {% for column_name, data_type in columns.items() %}
         {{ column_name }} {{ data_type }}{% if not loop.last %},{% endif %}
@@ -96,8 +96,10 @@ def create_ddl_dml_queries(tbl_schemas=TABLE_SCHEMAS):
     )
     ROW FORMAT DELIMITED FIELDS TERMINATED BY '|' ESCAPED BY '"'
     STORED AS TEXTFILE;
-    
-    LOAD DATA LOCAL INPATH '/opt/spark/work-dir/tpch-dbgen/{{ table_name }}.tbl' OVERWRITE INTO TABLE {{ table_name }};
+
+    LOAD DATA LOCAL INPATH
+     '/opt/spark/work-dir/tpch-dbgen/{{ table_name }}.tbl'
+     OVERWRITE INTO TABLE {{ table_name }};
     """
     )
 

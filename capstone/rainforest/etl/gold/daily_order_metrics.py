@@ -2,10 +2,9 @@ from datetime import datetime
 from typing import List, Optional, Type
 
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, date_format, lit
+from pyspark.sql.functions import col, lit
 from pyspark.sql.functions import mean as spark_mean
 from pyspark.sql.functions import sum as spark_sum
-from pyspark.sql.functions import to_date
 from rainforest.etl.gold.wide_orders import WideOrdersGoldETL
 from rainforest.utils.base_table import ETLDataSet, TableETL
 
@@ -39,8 +38,8 @@ class DailyOrderMetricsGoldETL(TableETL):
 
     def extract_upstream(self) -> List[ETLDataSet]:
         upstream_etl_datasets = []
-        for TableETL in self.upstream_table_names:
-            t1 = TableETL(spark=self.spark)
+        for TableETLClass in self.upstream_table_names:
+            t1 = TableETLClass(spark=self.spark)
             if self.run_upstream:
                 t1.run()
             upstream_etl_datasets.append(t1.read())

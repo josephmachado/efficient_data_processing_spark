@@ -67,8 +67,8 @@ pytest:
 	docker exec -ti spark-master bash -c 'export PYTHONPATH=/opt/spark/work-dir/adventureworks/pipelines && python3 -m pytest --log-cli-level info -p no:warnings -v ./adventureworks/tests'
 
 format:
-	docker exec -ti spark-master bash -c 'python3 -m black -S --line-length 79 --preview ./capstone ./data-processing-spark'
-	docker exec -ti spark-master bash -c 'isort ./data-processing-spark ./capstone'
+	docker exec spark-master black -S --line-length 79 --preview ./capstone ./data-processing-spark
+	docker exec spark-master isort ./data-processing-spark ./capstone
 
 type:
 	docker exec -ti spark-master bash -c 'python3 -m mypy --no-implicit-reexport --ignore-missing-imports --no-namespace-packages ./data-processing-spark ./capstone'

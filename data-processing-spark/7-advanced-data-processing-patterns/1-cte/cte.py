@@ -1,5 +1,3 @@
-import os
-
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, round, sum
 
@@ -15,8 +13,6 @@ def run_code(spark):
     nation = spark.table("nation")
     orders = spark.table("orders")
     customer = spark.table("customer")
-    partsupp = spark.table("partsupp")
-    part = spark.table("part")
 
     # Supplier and Buyer Nation Metrics
     supplier_nation_metrics = (

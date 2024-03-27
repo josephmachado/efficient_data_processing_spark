@@ -46,7 +46,7 @@ def run_code(spark):
     print("=======================================")
     spark.sql(
         """
-        EXPLAIN EXTENDED 
+        EXPLAIN EXTENDED
         SELECT
             o.orderkey,
             SUM(l.extendedprice * (1 - l.discount)) AS total_price_wo_tax

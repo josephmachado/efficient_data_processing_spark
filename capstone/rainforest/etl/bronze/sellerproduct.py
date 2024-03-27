@@ -1,4 +1,3 @@
-from dataclasses import asdict
 from datetime import datetime
 from typing import List, Optional, Type
 
@@ -33,7 +32,8 @@ class SellerProductBronzeETL(TableETL):
         )
 
     def extract_upstream(self) -> List[ETLDataSet]:
-        # Assuming seller product data is extracted from a database or other source
+        # Assuming seller product data is extracted from
+        # a database or other source
         # and loaded into a DataFrame
         jdbc_url = "jdbc:postgresql://upstream:5432/upstreamdb"
         connection_properties = {

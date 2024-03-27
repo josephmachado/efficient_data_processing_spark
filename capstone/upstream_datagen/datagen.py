@@ -1,6 +1,4 @@
 import random
-from datetime import datetime, timedelta
-
 import psycopg2
 from faker import Faker
 from psycopg2.extras import execute_values
@@ -154,8 +152,6 @@ def generate_order_data(buyer_ids, num_orders, user_ids):
         order_ts = fake.date_time_between(start_date="-1y", end_date="now")
         total_price = round(random.uniform(10.0, 1000.0), 2)
         created_ts = order_ts
-        last_updated_by = random.choice(user_ids) if user_ids else None
-        last_updated_ts = created_ts
         orders.append((buyer_id, order_ts, total_price, created_ts))
     return orders
 
@@ -170,8 +166,6 @@ def generate_order_item_data(order_ids, seller_ids, product_ids, user_ids):
         base_price = round(random.uniform(10.0, 500.0), 2)
         tax = round(base_price * 0.08, 2)  # Assuming an 8% tax
         created_ts = fake.date_time_between(start_date="-1y", end_date="now")
-        last_updated_by = random.choice(user_ids) if user_ids else None
-        last_updated_ts = created_ts
         order_items.append(
             (
                 order_id,
@@ -351,7 +345,8 @@ seller_ids = [row[0] for row in cur.fetchall()]
 cur.execute("SELECT product_id FROM Product")
 product_ids = [row[0] for row in cur.fetchall()]
 
-# Assuming you have product_ids and user_ids generated for the products and users
+# Assuming you have product_ids and user_ids generated
+# for the products and users
 num_ratings = 1000  # Example: generate 1000 ratings
 ratings_data = generate_ratings_data(num_ratings, product_ids, user_ids)
 insert_query = (

@@ -36,8 +36,8 @@ class ProductCategorySilverETL(TableETL):
 
     def extract_upstream(self) -> List[ETLDataSet]:
         upstream_etl_datasets = []
-        for TableETL in self.upstream_table_names:
-            t1 = TableETL(spark=self.spark)
+        for TableETLClass in self.upstream_table_names:
+            t1 = TableETLClass(spark=self.spark)
             if self.run_upstream:
                 t1.run()
             upstream_etl_datasets.append(t1.read())

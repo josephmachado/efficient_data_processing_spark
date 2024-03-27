@@ -1,15 +1,9 @@
-from pyspark.sql import DataFrame, SparkSession
-from rainforest.etl.bronze.appuser import AppUserBronzeETL
-from rainforest.etl.bronze.orders import OrdersSilverETL
-from rainforest.etl.bronze.seller import SellerBronzeETL
+from pyspark.sql import SparkSession
 from rainforest.etl.gold.daily_order_metrics import DailyOrderMetricsGoldETL
-from rainforest.etl.gold.wide_orders import WideOrdersGoldETL
 from rainforest.etl.interface.daily_category_report import \
     create_daily_category_report_view
 from rainforest.etl.interface.daily_order_report import \
     create_daily_order_report_view
-from rainforest.etl.silver.dim_seller import DimSellerSilverETL
-from rainforest.etl.silver.fct_orders import FactOrdersSilverETL
 
 
 def run_code(spark):
@@ -39,7 +33,9 @@ def run_code(spark):
     print("=================================")
     print("Running Silver dim_seller ETL")
     print("=================================")
-    silver_dim_seller = DimSellerSilverETL(spark=spark, upstream_table_names=[AppUserBronzeETL, SellerBronzeETL])
+    silver_dim_seller = DimSellerSilverETL(
+        spark=spark,
+        upstream_table_names=[AappUserBronzeETL, SellerBronzeETL])
     silver_dim_seller.run()
     silver_dim_seller.read().curr_data.show(10)
 
@@ -97,8 +93,6 @@ def run_code(spark):
     silver_dim_product.run()
     silver_dim_product.read().curr_data.show(10)
 
-    from rainforest.etl.silver.product_x_category import ProductCategorySilverETL
-
     print("=================================")
     print("Running Silver seller_x_product ETL")
     print("=================================")
@@ -138,8 +132,10 @@ def run_code(spark):
 
 if __name__ == "__main__":
     # Create a spark session
-    # Pass spark session with a variable that controls which chapter exercises to run
-    # The function should be able to accept the section number to run as well
+    # Pass spark session with a variable that controls
+    # which chapter exercises to run
+    # The function should be able to accept the section
+    # number to run as well
     # Have a function to run the spark sql code as well
     spark = (
         SparkSession.builder.appName("adventureworks")

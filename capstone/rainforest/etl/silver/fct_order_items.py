@@ -36,8 +36,8 @@ class FactOrderItemsSilverETL(TableETL):
 
     def extract_upstream(self) -> List[ETLDataSet]:
         upstream_etl_datasets = []
-        for TableETL in self.upstream_table_names:
-            t1 = TableETL(spark=self.spark)
+        for TableETLClass in self.upstream_table_names:
+            t1 = TableETLClass(spark=self.spark)
             if self.run_upstream:
                 t1.run()
             upstream_etl_datasets.append(t1.read())
@@ -49,10 +49,6 @@ class FactOrderItemsSilverETL(TableETL):
     ) -> ETLDataSet:
         order_item_data = upstream_datasets[0].curr_data
         current_timestamp = datetime.now()
-
-        # Convert total price to USD and INR
-        usd_conversion_rate = 0.014  # Assume 1 USD = 70 INR
-        inr_conversion_rate = 70
 
         # Calculate actual price (base price - tax)
         transformed_data = order_item_data.withColumn(

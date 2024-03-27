@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Type
+from typing import List, Optional, Type
 
 from pyspark.sql import DataFrame
 

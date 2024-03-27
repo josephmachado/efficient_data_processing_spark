@@ -16,7 +16,8 @@ class DailyCategoryMetricsGoldETL(TableETL):
         ],
         name: str = "daily_category_metrics",
         primary_keys: List[str] = ["order_date", "category"],
-        storage_path: str = "s3a://rainforest/delta/gold/daily_category_metrics",
+        storage_path: str =
+        "s3a://rainforest/delta/gold/daily_category_metrics",
         data_format: str = "delta",
         database: str = "rainforest",
         partition_keys: List[str] = ["etl_inserted"],
@@ -36,8 +37,8 @@ class DailyCategoryMetricsGoldETL(TableETL):
 
     def extract_upstream(self) -> List[ETLDataSet]:
         upstream_etl_datasets = []
-        for TableETL in self.upstream_table_names:
-            t1 = TableETL(spark=self.spark)
+        for TableETLClass in self.upstream_table_names:
+            t1 = TableETLClass(spark=self.spark)
             if self.run_upstream:
                 t1.run()
             upstream_etl_datasets.append(t1.read())
@@ -66,7 +67,8 @@ class DailyCategoryMetricsGoldETL(TableETL):
             "etl_inserted",
         )
 
-        # Group by order_date and category, calculate mean and median actual price
+        # Group by order_date and category, calculate mean and
+        # median actual price
         category_metrics_data = df_exploded.groupBy(
             "order_date", "category"
         ).agg(

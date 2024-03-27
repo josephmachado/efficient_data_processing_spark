@@ -1,7 +1,6 @@
 from pyspark.sql import SparkSession, Window
 from pyspark.sql import functions as F
-from pyspark.sql.functions import (avg, col, count, date_add, lit, round, sum,
-                                   year)
+from pyspark.sql.functions import col
 
 
 def run_code(spark):

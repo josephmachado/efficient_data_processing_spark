@@ -6,7 +6,8 @@ def run_code(spark):
     print("=================================")
     print("Use the result of a query within a query using sub-queries ")
     print("=================================")
-    # Read the 'lineitem', 'supplier', 'orders', 'customer', and 'nation' tables
+    # Read the 'lineitem', 'supplier', 'orders',
+    # 'customer', and 'nation' tables
     spark.sql("USE tpch")
     lineitem = spark.table("lineitem")
     supplier = spark.table("supplier")

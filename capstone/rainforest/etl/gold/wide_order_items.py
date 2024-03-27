@@ -3,7 +3,6 @@ from typing import List, Optional, Type
 
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, collect_list, lit, struct
-from rainforest.etl.silver.dim_buyer import DimBuyerSilverETL
 from rainforest.etl.silver.dim_category import DimCategorySilverETL
 from rainforest.etl.silver.dim_product import DimProductSilverETL
 from rainforest.etl.silver.dim_seller import DimSellerSilverETL
@@ -45,8 +44,8 @@ class WideOrderItemsGoldETL(TableETL):
 
     def extract_upstream(self) -> List[ETLDataSet]:
         upstream_etl_datasets = []
-        for TableETL in self.upstream_table_names:
-            t1 = TableETL(spark=self.spark)
+        for TableETLClass in self.upstream_table_names:
+            t1 = TableETLClass(spark=self.spark)
             if self.run_upstream:
                 t1.run()
             upstream_etl_datasets.append(t1.read())

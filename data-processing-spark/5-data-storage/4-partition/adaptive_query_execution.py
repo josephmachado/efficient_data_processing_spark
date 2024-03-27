@@ -1,7 +1,6 @@
 import os
 
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import count
 
 
 def run_code(spark):
@@ -15,7 +14,7 @@ def run_code(spark):
     print("==========================================")
     lineitem = spark.table("tpch.lineitem")
     lineitem.write.mode("overwrite").csv("price_metrics")
-    print(os.popen(f"ls -lh price_metrics/").read())
+    print(os.popen("ls -lh price_metrics/").read())
 
 
 if __name__ == '__main__':

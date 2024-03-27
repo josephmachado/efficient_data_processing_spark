@@ -2,7 +2,7 @@ version: '3'
 
 services:
   spark-master:
-    image: spark-image
+    image: spark-image 
     container_name: spark-master
     entrypoint: ['./entrypoint.sh', 'master']
     build:
