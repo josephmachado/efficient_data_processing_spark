@@ -1,4 +1,5 @@
 import random
+
 import psycopg2
 from faker import Faker
 from psycopg2.extras import execute_values
