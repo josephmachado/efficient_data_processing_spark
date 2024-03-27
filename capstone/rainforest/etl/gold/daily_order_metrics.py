@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional, Type
+from typing import Dict, List, Optional, Type
 
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, lit
@@ -95,7 +95,13 @@ class DailyOrderMetricsGoldETL(TableETL):
             data.storage_path
         )
 
-    def read(self, partition_keys: Optional[List[str]] = None) -> ETLDataSet:
+    def read(self, partition_values: Optional[Dict[str, str]] = None) -> ETLDataSet:
+        if partition_values:
+            partition_filter = " AND ".join([f"{k} = '{v}'" for k, v in partition_values.items()])
+        else:
+            latest_partition = self.spark.read.format(self.data_format).load(
+            self.storage_path).selectExpr("max(etl_inserted)").collect()[0][0]
+            partition_filter = f"etl_inserted = '{latest_partition}'"
         # Read the transformed data from the Delta Lake table
         daily_order_metrics_data = self.spark.read.format(
             self.data_format

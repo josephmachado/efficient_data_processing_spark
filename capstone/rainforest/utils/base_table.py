@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List, Optional, Type
+from typing import Dict, List, Optional, Type
 
 from pyspark.sql import DataFrame
 
@@ -66,5 +66,5 @@ class TableETL(ABC):
         self.load(transformed_data)
 
     @abstractmethod
-    def read(self, partition_keys: Optional[List[str]] = None) -> ETLDataSet:
+    def read(self, partition_values: Optional[Dict[str, str]] = None) -> ETLDataSet:
         pass
