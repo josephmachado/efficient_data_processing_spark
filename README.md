@@ -1,36 +1,47 @@
 # Efficient Data Processing in Spark 
 
-## Prerequisites
+Repository for examples and exercises from the "Efficient Data Processing in Spark" course (under [data-processing-spark](./data-processing-spark/)). The capstone project is also present in this repository (under [capstone/rainforest](./capstone/rainforest/)).
 
 ## Setup
 
-- python script 
-- create and count sql to docker container 
-- tpch-dbgen
+In order to run the project you'll need to install the following:
  
-## Data model
+1. [git version >= 2.37.1](https://github.com/git-guides/install-git)
+2. [Docker version >= 20.10.17](https://docs.docker.com/engine/install/) and [Docker compose v2 version >= v2.10.2](https://docs.docker.com/compose/#compose-v2-and-the-new-docker-compose-command).
 
-## Running queries
+**Windows users**: please setup WSL and a local Ubuntu Virtual machine following **[the instructions here](https://ubuntu.com/tutorials/install-ubuntu-on-wsl2-on-windows-10#1-overview)**. Install the above prerequisites on your ubuntu terminal; if you have trouble installing docker, follow **[the steps here](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-22-04#step-1-installing-docker)** (only Step 1 is necessary). Please install the **make** command with `sudo apt install make -y` (if its not already present). 
 
-- make spark sql
+All the commands shown below are to be run via the terminal (use the Ubuntu terminal for WSL users). The `make` commands in this book should be run in the `efficient_data_processing_spark` folder. We will use docker to set up our containers. Clone and move into the lab repository, as shown below.
 
-## Stopping containers
+```bash
+git clone https://github.com/josephmachado/efficient_data_processing_spark.git
+cd efficient_data_processing_spark
+```
 
-## Acknowledgements
+**Makefile** lets you define shortcuts for commands that you might want to run, E.g., in our <u>[Makefile](https://github.com/josephmachado/efficient_data_processing_spark/blob/main/Makefile)</u>, we set the alias `spark-sql` for the command that opens us a spark sql session.
 
-<!--
-Data: https://github.com/databricks/tpch-dbgen
-Generate data => mount into shared volume => access via spark 
+We have some helpful **make** commands for working with our systems. Shown below are the make commands and their definitions
 
-Note: tpch dbgen issues with mac https://github.com/pola-rs/tpch
+1. `make up`: Spin up the docker containers.
+2. `make spark-sql`: Open a spark sql session; Use exit to quit the cli. **This is where you will type your SQL queries**.
+3. `make setup`: Generates data and [loads them into tables](https://github.com/josephmachado/efficient_data_processing_spark/blob/main/containers/spark/setup.sql) and starts spark histroy server where we can see logs/Spark UI for already completed jobs.
+4. `make down`: Stop the docker containers.
+5. `make cr`: To run our pyspark code by pasting the relative path of exercise/example problems under [data-processing-spark](./data-processing-spark/) folder. See example image shown below.
+6. `make rainforest`: Runs our rainforest capstone project, the entry point for this code is [here](./capstone/run_code.py)
 
-1. Load data into spark (docker data location /opt/spark/work-dir/tpch/tpch-dbgen/customer.tbl)
-2. tables: customer.tbl lineitem.tbl nation.tbl   orders.tbl   part.tbl     partsupp.tbl region.tbl   supplier.tbl
-3. DDL query
--->
+This is how you run pyspark exercise files:
+![make cr example](./assets/make_cr.webm)
 
-## Not currently available
+You can see the commands in <u>[this Makefile](https://github.com/josephmachado/efficient_data_processing_spark/blob/main/Makefile)</u>. If your terminal does not support **make** commands, please use the commands in <u>[the Makefile](https://github.com/josephmachado/efficient_data_processing_spark/blob/main/Makefile)</u> directly. All the commands in this book assume that you have the docker containers running.
 
-1. Window definition: GROUPS range
-2. recursive CTEs 6-1
-3. GROUPING SETS are called cubes in spark
+## Infrastructure Diagram
+
+We have 4 major services that run together, they are
+
+1. **Postgres database**: We use a postgres data base to simulate an upstream application database for our rainforest capstone project.
+2. **Spark cluster**: We create a spark cluster with a master and 2 workers which is where the data is processed. The spark cluster also includes a history server, which displays the logs and resource utilization (Spark UI) for completed/failed spark applications.
+3. **Minio**: Minio is an open source software that has fully compatable API with AWS S3 cloud storage system. We use minio to replicate S3 locally.
+
+![Infra](./assets/infra.png)
+
+All our Spark images are built from the official Spark Delta image, and have the necessary modules installed. You can find the docker files defined [here](./data-processing-spark/1-lab-setup/containers/)
