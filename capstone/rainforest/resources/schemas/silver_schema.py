@@ -1,7 +1,9 @@
 from pyspark.sql import SparkSession
 
 
-def create_tables(spark, path="s3a://rainforest/delta", database: str = "rainforest"):
+def create_tables(
+    spark, path="s3a://rainforest/delta", database: str = "rainforest"
+):
     spark.sql(f"CREATE DATABASE IF NOT EXISTS {database}")
 
     # Dimensions

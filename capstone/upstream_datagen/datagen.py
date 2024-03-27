@@ -1,8 +1,9 @@
-import psycopg2
-from psycopg2.extras import execute_values
-from faker import Faker
-from datetime import datetime, timedelta
 import random
+from datetime import datetime, timedelta
+
+import psycopg2
+from faker import Faker
+from psycopg2.extras import execute_values
 
 # Connect to PostgreSQL database
 conn = psycopg2.connect(
@@ -34,7 +35,14 @@ def generate_user_data(num_users):
         last_updated_by = u_num + 1
         last_updated_ts = created_ts
         users.append(
-            (username, email, is_active, created_ts, last_updated_by, last_updated_ts)
+            (
+                username,
+                email,
+                is_active,
+                created_ts,
+                last_updated_by,
+                last_updated_ts,
+            )
         )
     return users
 
@@ -94,7 +102,14 @@ def generate_product_data(num_products, user_ids):
         last_updated_by = random.choice(user_ids) if user_ids else None
         last_updated_ts = created_ts
         products.append(
-            (name, description, price, created_ts, last_updated_by, last_updated_ts)
+            (
+                name,
+                description,
+                price,
+                created_ts,
+                last_updated_by,
+                last_updated_ts,
+            )
         )
     return products
 
@@ -139,16 +154,9 @@ def generate_order_data(buyer_ids, num_orders, user_ids):
         order_ts = fake.date_time_between(start_date="-1y", end_date="now")
         total_price = round(random.uniform(10.0, 1000.0), 2)
         created_ts = order_ts
-        last_updated_by =  random.choice(user_ids) if user_ids else None
+        last_updated_by = random.choice(user_ids) if user_ids else None
         last_updated_ts = created_ts
-        orders.append(
-            (
-                buyer_id,
-                order_ts,
-                total_price,
-                created_ts
-            )
-        )
+        orders.append((buyer_id, order_ts, total_price, created_ts))
     return orders
 
 
@@ -186,10 +194,16 @@ def generate_clickstream_data(user_ids, product_ids, order_ids):
         for _ in range(random.randint(5, 20)):
             event_type = random.choice(event_types)
             product_id = (
-                random.choice(product_ids) if event_type != "purchase" else None
+                random.choice(product_ids)
+                if event_type != "purchase"
+                else None
             )
-            order_id = random.choice(order_ids) if event_type == "purchase" else None
-            timestamp = fake.date_time_between(start_date="-1y", end_date="now")
+            order_id = (
+                random.choice(order_ids) if event_type == "purchase" else None
+            )
+            timestamp = fake.date_time_between(
+                start_date="-1y", end_date="now"
+            )
             created_ts = timestamp
             clickstreams.append(
                 (
@@ -214,9 +228,14 @@ def generate_brand_data(num_brands, user_ids):
         country = fake.country()
         created_ts = fake.date_time_between(start_date='-1y', end_date='now')
         last_updated_by = random.choice(user_ids)
-        last_updated_ts = fake.date_time_between(start_date=created_ts, end_date='now')
-        brand_data.append((brand_name, country, created_ts, last_updated_by, last_updated_ts))
+        last_updated_ts = fake.date_time_between(
+            start_date=created_ts, end_date='now'
+        )
+        brand_data.append(
+            (brand_name, country, created_ts, last_updated_by, last_updated_ts)
+        )
     return brand_data
+
 
 def generate_manufacturer_data(num_manufacturers, user_ids):
     """
@@ -228,9 +247,20 @@ def generate_manufacturer_data(num_manufacturers, user_ids):
         manufacturer_type = fake.word()
         created_ts = fake.date_time_between(start_date='-1y', end_date='now')
         last_updated_by = random.choice(user_ids)
-        last_updated_ts = fake.date_time_between(start_date=created_ts, end_date='now')
-        manufacturer_data.append((manufacturer_name, manufacturer_type, created_ts, last_updated_by, last_updated_ts))
+        last_updated_ts = fake.date_time_between(
+            start_date=created_ts, end_date='now'
+        )
+        manufacturer_data.append(
+            (
+                manufacturer_name,
+                manufacturer_type,
+                created_ts,
+                last_updated_by,
+                last_updated_ts,
+            )
+        )
     return manufacturer_data
+
 
 def generate_ratings_data(num_ratings, product_ids, user_ids):
     """
@@ -242,9 +272,14 @@ def generate_ratings_data(num_ratings, product_ids, user_ids):
         rating = round(random.uniform(0, 5), 2)
         created_ts = fake.date_time_between(start_date='-1y', end_date='now')
         last_updated_by = random.choice(user_ids)
-        last_updated_ts = fake.date_time_between(start_date=created_ts, end_date='now')
-        ratings_data.append((product_id, rating, created_ts, last_updated_by, last_updated_ts))
+        last_updated_ts = fake.date_time_between(
+            start_date=created_ts, end_date='now'
+        )
+        ratings_data.append(
+            (product_id, rating, created_ts, last_updated_by, last_updated_ts)
+        )
     return ratings_data
+
 
 # Generate and insert data into tables
 num_users = 1000
@@ -252,7 +287,10 @@ num_products = 500
 
 # Generate and insert user data
 user_data = generate_user_data(num_users)
-insert_query = 'INSERT INTO AppUser (username, email, is_active, created_ts, last_updated_by, last_updated_ts) VALUES %s'
+insert_query = (
+    'INSERT INTO AppUser (username, email, is_active, created_ts,'
+    ' last_updated_by, last_updated_ts) VALUES %s'
+)
 execute_values(cur, insert_query, user_data)
 conn.commit()
 
@@ -262,32 +300,47 @@ user_ids = [row[0] for row in cur.fetchall()]
 
 num_brands = 50
 brand_data = generate_brand_data(num_brands, user_ids)
-insert_query = 'INSERT INTO Brand (name, country, created_ts, last_updated_by, last_updated_ts) VALUES %s'
+insert_query = (
+    'INSERT INTO Brand (name, country, created_ts, last_updated_by,'
+    ' last_updated_ts) VALUES %s'
+)
 execute_values(cur, insert_query, brand_data)
 conn.commit()
 
 num_manufacturers = 50
 manufacturer_data = generate_manufacturer_data(num_manufacturers, user_ids)
-insert_query = 'INSERT INTO Manufacturer (name, type, created_ts, last_updated_by, last_updated_ts) VALUES %s'
+insert_query = (
+    'INSERT INTO Manufacturer (name, type, created_ts, last_updated_by,'
+    ' last_updated_ts) VALUES %s'
+)
 execute_values(cur, insert_query, manufacturer_data)
 conn.commit()
 
 
 # Generate and insert seller data
 seller_data = generate_seller_data(user_ids)
-insert_query = "INSERT INTO Seller (user_id, first_time_sold_timestamp, created_ts, last_updated_by, last_updated_ts) VALUES %s"
+insert_query = (
+    "INSERT INTO Seller (user_id, first_time_sold_timestamp, created_ts,"
+    " last_updated_by, last_updated_ts) VALUES %s"
+)
 execute_values(cur, insert_query, seller_data)
 conn.commit()
 
 # Generate and insert buyer data
 buyer_data = generate_buyer_data(user_ids)
-insert_query = "INSERT INTO Buyer (user_id, first_time_purchased_timestamp, created_ts, last_updated_by, last_updated_ts) VALUES %s"
+insert_query = (
+    "INSERT INTO Buyer (user_id, first_time_purchased_timestamp, created_ts,"
+    " last_updated_by, last_updated_ts) VALUES %s"
+)
 execute_values(cur, insert_query, buyer_data)
 conn.commit()
 
 # Generate and insert product data
 product_data = generate_product_data(num_products, user_ids)
-insert_query = "INSERT INTO Product (name, description, price, created_ts, last_updated_by, last_updated_ts) VALUES %s"
+insert_query = (
+    "INSERT INTO Product (name, description, price, created_ts,"
+    " last_updated_by, last_updated_ts) VALUES %s"
+)
 execute_values(cur, insert_query, product_data)
 conn.commit()
 
@@ -301,7 +354,10 @@ product_ids = [row[0] for row in cur.fetchall()]
 # Assuming you have product_ids and user_ids generated for the products and users
 num_ratings = 1000  # Example: generate 1000 ratings
 ratings_data = generate_ratings_data(num_ratings, product_ids, user_ids)
-insert_query = "INSERT INTO Ratings (product_id, rating, created_ts, last_updated_by, last_updated_ts) VALUES %s"
+insert_query = (
+    "INSERT INTO Ratings (product_id, rating, created_ts, last_updated_by,"
+    " last_updated_ts) VALUES %s"
+)
 execute_values(cur, insert_query, ratings_data)
 conn.commit()
 
@@ -314,7 +370,10 @@ conn.commit()
 # Generate and insert category data
 num_categories = 20
 category_data = generate_category_data(num_categories, user_ids)
-insert_query = "INSERT INTO Category (name, created_ts, last_updated_by, last_updated_ts) VALUES %s"
+insert_query = (
+    "INSERT INTO Category (name, created_ts, last_updated_by, last_updated_ts)"
+    " VALUES %s"
+)
 execute_values(cur, insert_query, category_data)
 conn.commit()
 
@@ -323,8 +382,12 @@ cur.execute("SELECT category_id FROM Category")
 category_ids = [row[0] for row in cur.fetchall()]
 
 # Generate and insert product_category data
-product_category_data = generate_product_category_data(product_ids, category_ids)
-insert_query = "INSERT INTO ProductCategory (product_id, category_id) VALUES %s"
+product_category_data = generate_product_category_data(
+    product_ids, category_ids
+)
+insert_query = (
+    "INSERT INTO ProductCategory (product_id, category_id) VALUES %s"
+)
 execute_values(cur, insert_query, product_category_data)
 conn.commit()
 
@@ -335,7 +398,10 @@ buyer_ids = [row[0] for row in cur.fetchall()]
 # Generate and insert order data
 num_orders = 5000
 order_data = generate_order_data(buyer_ids, num_orders, user_ids)
-insert_query = 'INSERT INTO orders (buyer_id, order_ts, total_price, created_ts) VALUES %s'
+insert_query = (
+    'INSERT INTO orders (buyer_id, order_ts, total_price, created_ts)'
+    ' VALUES %s'
+)
 execute_values(cur, insert_query, order_data)
 conn.commit()
 
@@ -344,8 +410,13 @@ cur.execute('SELECT order_id FROM orders')
 order_ids = [row[0] for row in cur.fetchall()]
 
 # Generate and insert order_item data
-order_item_data = generate_order_item_data(order_ids, seller_ids, product_ids, user_ids)
-insert_query = "INSERT INTO OrderItem (order_id, product_id, seller_id, quantity, base_price, tax, created_ts) VALUES %s"
+order_item_data = generate_order_item_data(
+    order_ids, seller_ids, product_ids, user_ids
+)
+insert_query = (
+    "INSERT INTO OrderItem (order_id, product_id, seller_id, quantity,"
+    " base_price, tax, created_ts) VALUES %s"
+)
 execute_values(cur, insert_query, order_item_data)
 conn.commit()
 
@@ -355,7 +426,10 @@ user_ids = [row[0] for row in cur.fetchall()]
 
 # Generate and insert clickstream data
 clickstream_data = generate_clickstream_data(user_ids, product_ids, order_ids)
-insert_query = "INSERT INTO Clickstream (user_id, event_type, product_id, order_id, timestamp, created_ts) VALUES %s"
+insert_query = (
+    "INSERT INTO Clickstream (user_id, event_type, product_id, order_id,"
+    " timestamp, created_ts) VALUES %s"
+)
 execute_values(cur, insert_query, clickstream_data)
 conn.commit()
 

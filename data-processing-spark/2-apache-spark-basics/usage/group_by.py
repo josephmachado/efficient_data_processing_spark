@@ -1,6 +1,7 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import count
 
+
 def run_code(spark):
     print("=================================")
     print("Generate metrics for your dimension(s) using GROUP BY")
@@ -20,6 +21,7 @@ def run_code(spark):
 
     # Show the result
     result.show()
+
 
 if __name__ == '__main__':
     spark = (

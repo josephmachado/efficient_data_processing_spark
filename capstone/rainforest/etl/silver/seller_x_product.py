@@ -1,16 +1,19 @@
 from datetime import datetime
+from typing import List, Optional, Type
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import lit
-from typing import List, Optional, Type
-from rainforest.utils.base_table import ETLDataSet, TableETL
 from rainforest.etl.bronze.sellerproduct import SellerProductBronzeETL
+from rainforest.utils.base_table import ETLDataSet, TableETL
 
 
 class SellerProductSilverETL(TableETL):
     def __init__(
         self,
         spark: SparkSession,
-        upstream_table_names: Optional[List[Type[TableETL]]] = [SellerProductBronzeETL],
+        upstream_table_names: Optional[List[Type[TableETL]]] = [
+            SellerProductBronzeETL
+        ],
         name: str = "seller_x_product",
         primary_keys: List[str] = ["seller_id", "product_id"],
         storage_path: str = "s3a://rainforest/delta/silver/seller_x_product",
@@ -38,10 +41,12 @@ class SellerProductSilverETL(TableETL):
             if self.run_upstream:
                 t1.run()
             upstream_etl_datasets.append(t1.read())
-        
+
         return upstream_etl_datasets
 
-    def transform_upstream(self, upstream_datasets: List[ETLDataSet]) -> ETLDataSet:
+    def transform_upstream(
+        self, upstream_datasets: List[ETLDataSet]
+    ) -> ETLDataSet:
         seller_product_data = upstream_datasets[0].curr_data
         current_timestamp = datetime.now()
 
@@ -70,13 +75,17 @@ class SellerProductSilverETL(TableETL):
         seller_product_data = data.curr_data
 
         # Write the transformed data to the Delta Lake table
-        seller_product_data.write.option("mergeSchema", "true").format(data.data_format).mode("overwrite").partitionBy(
-            data.partition_keys
-        ).save(data.storage_path)
+        seller_product_data.write.option("mergeSchema", "true").format(
+            data.data_format
+        ).mode("overwrite").partitionBy(data.partition_keys).save(
+            data.storage_path
+        )
 
     def read(self, partition_keys: Optional[List[str]] = None) -> ETLDataSet:
         # Read the transformed data from the Delta Lake table
-        seller_product_data = self.spark.read.format(self.data_format).load(self.storage_path)
+        seller_product_data = self.spark.read.format(self.data_format).load(
+            self.storage_path
+        )
 
         # Create an ETLDataSet instance
         etl_dataset = ETLDataSet(
@@ -90,4 +99,3 @@ class SellerProductSilverETL(TableETL):
         )
 
         return etl_dataset
-

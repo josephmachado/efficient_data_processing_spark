@@ -1,5 +1,6 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, year, weekofyear
+from pyspark.sql.functions import col, weekofyear, year
+
 
 def run_code(spark):
     print("=================================")
@@ -170,7 +171,9 @@ def run_code(spark):
     print("CROSS JOIN")
     print("======================================")
     cross_join_result = (
-        nation.alias("n").crossJoin(region.alias("r")).select("n.name", "r.name")
+        nation.alias("n")
+        .crossJoin(region.alias("r"))
+        .select("n.name", "r.name")
     )
     cross_join_result.show()
 
@@ -182,14 +185,16 @@ def run_code(spark):
             orders.alias("o2"),
             (col("o1.custkey") == col("o2.custkey"))
             & (year(col("o1.orderdate")) == year(col("o2.orderdate")))
-            & (weekofyear(col("o1.orderdate")) == weekofyear(col("o2.orderdate"))),
+            & (
+                weekofyear(col("o1.orderdate"))
+                == weekofyear(col("o2.orderdate"))
+            ),
             how="inner",
         )
         .filter(col("o1.orderkey") != col("o2.orderkey"))
         .select("o1.custkey")
     )
     exercise_result.show()
-
 
 
 if __name__ == '__main__':

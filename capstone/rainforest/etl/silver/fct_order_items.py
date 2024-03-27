@@ -1,16 +1,19 @@
 from datetime import datetime
+from typing import List, Optional, Type
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, lit
-from typing import List, Optional, Type
-from rainforest.utils.base_table import ETLDataSet, TableETL
 from rainforest.etl.bronze.orderitem import OrderItemBronzeETL
+from rainforest.utils.base_table import ETLDataSet, TableETL
 
 
 class FactOrderItemsSilverETL(TableETL):
     def __init__(
         self,
         spark: SparkSession,
-        upstream_table_names: Optional[List[Type[TableETL]]] = [OrderItemBronzeETL],
+        upstream_table_names: Optional[List[Type[TableETL]]] = [
+            OrderItemBronzeETL
+        ],
         name: str = "fact_order_items",
         primary_keys: List[str] = ["order_item_id"],
         storage_path: str = "s3a://rainforest/delta/silver/fact_order_items",
@@ -38,10 +41,12 @@ class FactOrderItemsSilverETL(TableETL):
             if self.run_upstream:
                 t1.run()
             upstream_etl_datasets.append(t1.read())
-        
+
         return upstream_etl_datasets
 
-    def transform_upstream(self, upstream_datasets: List[ETLDataSet]) -> ETLDataSet:
+    def transform_upstream(
+        self, upstream_datasets: List[ETLDataSet]
+    ) -> ETLDataSet:
         order_item_data = upstream_datasets[0].curr_data
         current_timestamp = datetime.now()
 
@@ -52,9 +57,7 @@ class FactOrderItemsSilverETL(TableETL):
         # Calculate actual price (base price - tax)
         transformed_data = order_item_data.withColumn(
             "actual_price", col("base_price") - col("tax")
-        ).withColumn(
-            "etl_inserted", lit(current_timestamp)
-        )
+        ).withColumn("etl_inserted", lit(current_timestamp))
 
         # Create a new ETLDataSet instance with the transformed data
         etl_dataset = ETLDataSet(
@@ -77,13 +80,17 @@ class FactOrderItemsSilverETL(TableETL):
         order_item_data = data.curr_data
 
         # Write the transformed data to the Delta Lake table
-        order_item_data.write.option("mergeSchema", "true").format(data.data_format).mode("overwrite").partitionBy(
-            data.partition_keys
-        ).save(data.storage_path)
+        order_item_data.write.option("mergeSchema", "true").format(
+            data.data_format
+        ).mode("overwrite").partitionBy(data.partition_keys).save(
+            data.storage_path
+        )
 
     def read(self, partition_keys: Optional[List[str]] = None) -> ETLDataSet:
         # Read the transformed data from the Delta Lake table
-        order_items_data = self.spark.read.format(self.data_format).load(self.storage_path)
+        order_items_data = self.spark.read.format(self.data_format).load(
+            self.storage_path
+        )
         # Explicitly select columns
         order_items_data = order_items_data.select(
             col("order_item_id"),

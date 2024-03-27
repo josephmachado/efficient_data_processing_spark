@@ -1,10 +1,8 @@
 import os
+
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import (
-    col,
-    sum,
-    round,
-)
+from pyspark.sql.functions import col, round, sum
+
 
 def run_code(spark):
     print("=================================")
@@ -59,6 +57,7 @@ def run_code(spark):
     )
 
     result.show()
+
 
 if __name__ == '__main__':
     spark = (

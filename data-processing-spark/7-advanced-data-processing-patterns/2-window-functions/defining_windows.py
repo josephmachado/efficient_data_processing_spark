@@ -1,6 +1,6 @@
-from pyspark.sql import Window, functions as F
-from pyspark.sql import SparkSession
-from pyspark.sql.functions import sum, round
+from pyspark.sql import SparkSession, Window
+from pyspark.sql import functions as F
+from pyspark.sql.functions import round, sum
 
 
 def run_code(spark):
@@ -27,6 +27,7 @@ def run_code(spark):
 
     # Show the result
     result_df.show()
+
 
 if __name__ == '__main__':
     spark = (

@@ -1,6 +1,7 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
 
+
 def run_code(spark):
     print("=================================")
     print("Create a table, insert data, delete data, and drop the table")
@@ -37,7 +38,9 @@ def run_code(spark):
     print("INSERT INTO sample_table2 SELECT nationkey, name FROM nation")
     print("=================================")
     nation_df = spark.table("nation")
-    sample_table2_df = sample_table2_df.union(nation_df.select("nationkey", "name"))
+    sample_table2_df = sample_table2_df.union(
+        nation_df.select("nationkey", "name")
+    )
     sample_table2_df.show()
 
     print("=================================")
@@ -50,6 +53,7 @@ def run_code(spark):
     print("DROP TABLE sample_table2")
     print("=================================")
     spark.sql("DROP TABLE IF EXISTS sample_table2")
+
 
 if __name__ == '__main__':
     spark = (

@@ -1,11 +1,10 @@
-
 from __future__ import annotations
-from dataclasses import dataclass
+
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Type
 
-from typing import Dict, Type, List, Optional
 from pyspark.sql import DataFrame
-
 
 
 @dataclass
@@ -20,7 +19,6 @@ class ETLDataSet:
 
 
 class TableETL(ABC):
-
     @abstractmethod
     def __init__(
         self,
@@ -49,7 +47,9 @@ class TableETL(ABC):
         pass
 
     @abstractmethod
-    def transform_upstream(self, upstream_datasets: List[ETLDataSet]) -> ETLDataSet:
+    def transform_upstream(
+        self, upstream_datasets: List[ETLDataSet]
+    ) -> ETLDataSet:
         pass
 
     @abstractmethod

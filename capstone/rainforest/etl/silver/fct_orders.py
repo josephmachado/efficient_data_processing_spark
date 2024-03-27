@@ -1,17 +1,20 @@
+from dataclasses import asdict
 from datetime import datetime
+from typing import List, Optional, Type
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, lit
-from typing import List, Optional, Type
-from dataclasses import asdict
-from rainforest.utils.base_table import ETLDataSet, TableETL
 from rainforest.etl.bronze.orders import OrdersSilverETL
+from rainforest.utils.base_table import ETLDataSet, TableETL
 
 
 class FactOrdersSilverETL(TableETL):
     def __init__(
         self,
         spark: SparkSession,
-        upstream_table_names: Optional[List[Type[TableETL]]] = [OrdersSilverETL],
+        upstream_table_names: Optional[List[Type[TableETL]]] = [
+            OrdersSilverETL
+        ],
         name: str = "fact_orders",
         primary_keys: List[str] = ["order_id"],
         storage_path: str = "s3a://rainforest/delta/silver/fact_orders",
@@ -39,10 +42,12 @@ class FactOrdersSilverETL(TableETL):
             if self.run_upstream:
                 t1.run()
             upstream_etl_datasets.append(t1.read())
-        
+
         return upstream_etl_datasets
 
-    def transform_upstream(self, upstream_datasets: List[ETLDataSet]) -> ETLDataSet:
+    def transform_upstream(
+        self, upstream_datasets: List[ETLDataSet]
+    ) -> ETLDataSet:
         order_data = upstream_datasets[0].curr_data
         current_timestamp = datetime.now()
 
@@ -82,13 +87,17 @@ class FactOrdersSilverETL(TableETL):
         order_data = data.curr_data
 
         # Write the transformed data to the Delta Lake table
-        order_data.write.option("mergeSchema", "true").format(data.data_format).mode("overwrite").partitionBy(
-            data.partition_keys
-        ).save(data.storage_path)
+        order_data.write.option("mergeSchema", "true").format(
+            data.data_format
+        ).mode("overwrite").partitionBy(data.partition_keys).save(
+            data.storage_path
+        )
 
     def read(self, partition_keys: Optional[List[str]] = None) -> ETLDataSet:
         # Read the transformed data from the Delta Lake table
-        orders_data = self.spark.read.format(self.data_format).load(self.storage_path)
+        orders_data = self.spark.read.format(self.data_format).load(
+            self.storage_path
+        )
         # Explicitly select columns
         orders_data = orders_data.select(
             col("order_id"),

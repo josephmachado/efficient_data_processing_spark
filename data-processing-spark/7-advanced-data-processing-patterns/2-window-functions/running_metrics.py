@@ -1,7 +1,7 @@
-from pyspark.sql import SparkSession
-from pyspark.sql.functions import round, sum, col, count, date_add, lit, year, avg
-from pyspark.sql import Window, functions as F
-
+from pyspark.sql import SparkSession, Window
+from pyspark.sql import functions as F
+from pyspark.sql.functions import (avg, col, count, date_add, lit, round, sum,
+                                   year)
 
 
 def run_code(spark):
@@ -20,7 +20,9 @@ def run_code(spark):
             round(sum("orders.totalprice"), 2).alias("total_price"),
             round(
                 sum(sum("orders.totalprice")).over(
-                    Window.partitionBy("orders.custkey").orderBy("orders.orderdate")
+                    Window.partitionBy("orders.custkey").orderBy(
+                        "orders.orderdate"
+                    )
                 ),
                 2,
             ).alias("cumulative_sum_total_price"),
@@ -41,5 +43,3 @@ if __name__ == '__main__':
     spark.sparkContext.setLogLevel("ERROR")
     run_code(spark=spark)
     spark.stop
-
-

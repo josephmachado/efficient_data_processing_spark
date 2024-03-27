@@ -1,13 +1,15 @@
 from pyspark.sql import DataFrame, SparkSession
 from rainforest.etl.bronze.appuser import AppUserBronzeETL
-from rainforest.etl.bronze.seller import SellerBronzeETL
 from rainforest.etl.bronze.orders import OrdersSilverETL
+from rainforest.etl.bronze.seller import SellerBronzeETL
+from rainforest.etl.gold.daily_order_metrics import DailyOrderMetricsGoldETL
+from rainforest.etl.gold.wide_orders import WideOrdersGoldETL
+from rainforest.etl.interface.daily_category_report import \
+    create_daily_category_report_view
+from rainforest.etl.interface.daily_order_report import \
+    create_daily_order_report_view
 from rainforest.etl.silver.dim_seller import DimSellerSilverETL
 from rainforest.etl.silver.fct_orders import FactOrdersSilverETL
-from rainforest.etl.gold.wide_orders import WideOrdersGoldETL
-from rainforest.etl.gold.daily_order_metrics import DailyOrderMetricsGoldETL
-from rainforest.etl.interface.daily_order_report import create_daily_order_report_view
-from rainforest.etl.interface.daily_category_report import create_daily_category_report_view
 
 
 def run_code(spark):
@@ -32,8 +34,8 @@ def run_code(spark):
     bronze_seller = SellerBronzeETL(spark=spark)
     bronze_seller.run()
     bronze_seller.read().curr_data.show(10)
-    
-    
+
+
     print("=================================")
     print("Running Silver dim_seller ETL")
     print("=================================")
@@ -47,18 +49,18 @@ def run_code(spark):
     silver_fct_orders = FactOrdersSilverETL(spark=spark)
     silver_fct_orders.run()
     silver_fct_orders.read().curr_data.show(10)
-    
+
     print("=================================")
     print("Running Gold wide_orders ETL")
     print("=================================")
     gold_wide_orders = WideOrdersGoldETL(spark=spark)
     gold_wide_orders.run()
     gold_wide_orders.read().curr_data.show()
-    
+
     print("=================================")
     print("Running Gold dail_order_metrics ETL")
     print("=================================")
-    
+
     from rainforest.etl.silver.dim_buyer import DimBuyerSilverETL
 
     print("=================================")
@@ -85,7 +87,7 @@ def run_code(spark):
     silver_seller_x_product = SellerProductSilverETL(spark=spark)
     silver_seller_x_product.run()
     silver_seller_x_product.read().curr_data.show(10)
-    
+
     from rainforest.etl.silver.dim_product import DimProductSilverETL
 
     print("=================================")
@@ -94,7 +96,7 @@ def run_code(spark):
     silver_dim_product = DimProductSilverETL(spark=spark)
     silver_dim_product.run()
     silver_dim_product.read().curr_data.show(10)
-    
+
     from rainforest.etl.silver.product_x_category import ProductCategorySilverETL
 
     print("=================================")
@@ -103,7 +105,7 @@ def run_code(spark):
     silver_seller_x_product = ProductCategorySilverETL(spark=spark)
     silver_seller_x_product.run()
     silver_seller_x_product.read().curr_data.show(10)
-    
+
 
     from rainforest.etl.gold.wide_order_items import WideOrderItemsGoldETL
     print("=================================")
@@ -114,7 +116,9 @@ def run_code(spark):
     silver_seller_x_product.read().curr_data.show(10)
     """
 
-    from rainforest.etl.gold.daily_category_metrics import DailyCategoryMetricsGoldETL
+    from rainforest.etl.gold.daily_category_metrics import \
+        DailyCategoryMetricsGoldETL
+
     print("=================================")
     print("Daily Category Report")
     print("=================================")
@@ -131,13 +135,16 @@ def run_code(spark):
     create_daily_order_report_view(gold_daily_order_metrics.read().curr_data)
     spark.sql("select * from global_temp.daily_order_report").show()
 
+
 if __name__ == "__main__":
     # Create a spark session
     # Pass spark session with a variable that controls which chapter exercises to run
     # The function should be able to accept the section number to run as well
     # Have a function to run the spark sql code as well
     spark = (
-        SparkSession.builder.appName("adventureworks").enableHiveSupport().getOrCreate()
+        SparkSession.builder.appName("adventureworks")
+        .enableHiveSupport()
+        .getOrCreate()
     )
     spark.sparkContext.setLogLevel("ERROR")
     run_code(spark)

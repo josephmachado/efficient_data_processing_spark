@@ -1,9 +1,10 @@
+from abc import ABC
+from dataclasses import asdict
 from datetime import datetime
+from typing import List, Optional, Type
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, lit
-from typing import List, Optional, Type
-from dataclasses import asdict
-from abc import ABC
 from rainforest.utils.base_table import ETLDataSet, TableETL
 
 
@@ -59,12 +60,16 @@ class AppUserBronzeETL(TableETL):
 
         return [etl_dataset]
 
-    def transform_upstream(self, upstream_datasets: List[ETLDataSet]) -> ETLDataSet:
+    def transform_upstream(
+        self, upstream_datasets: List[ETLDataSet]
+    ) -> ETLDataSet:
         user_data = upstream_datasets[0].curr_data
         current_timestamp = datetime.now()
 
         # Perform any necessary transformations on the user data
-        transformed_data = user_data.withColumn("etl_inserted", lit(current_timestamp))
+        transformed_data = user_data.withColumn(
+            "etl_inserted", lit(current_timestamp)
+        )
 
         # Create a new ETLDataSet instance with the transformed data
         etl_dataset = ETLDataSet(
@@ -93,7 +98,9 @@ class AppUserBronzeETL(TableETL):
 
     def read(self, partition_keys: Optional[List[str]] = None) -> ETLDataSet:
         # Read the user data from the Delta Lake table
-        user_data = self.spark.read.format(self.data_format).load(self.storage_path)
+        user_data = self.spark.read.format(self.data_format).load(
+            self.storage_path
+        )
         # Explicitly select columns
         user_data = user_data.select(
             col("user_id"),

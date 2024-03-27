@@ -1,6 +1,7 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import sum
 
+
 def run_code(spark):
     print("=================================")
     print("Save queries as views for more straightforward reads")
@@ -43,12 +44,19 @@ def run_code(spark):
         .join(purchased_items_quantity, "nationkey", "left_outer")
         .select(
             "nation.name",
-            supplied_items_quantity["quantity"].alias("supplied_items_quantity"),
-            purchased_items_quantity["quantity"].alias("purchased_items_quantity"),
+            supplied_items_quantity["quantity"].alias(
+                "supplied_items_quantity"
+            ),
+            purchased_items_quantity["quantity"].alias(
+                "purchased_items_quantity"
+            ),
         )
     )
-    nation_supplied_purchased_quantity.createOrReplaceTempView("nation_supplied_purchased_quantity")
+    nation_supplied_purchased_quantity.createOrReplaceTempView(
+        "nation_supplied_purchased_quantity"
+    )
     spark.sql("SELECT * FROM nation_supplied_purchased_quantity").show()
+
 
 if __name__ == '__main__':
     spark = (

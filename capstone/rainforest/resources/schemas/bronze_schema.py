@@ -1,12 +1,14 @@
 from pyspark.sql import SparkSession
 
 
-def create_tables(spark, path="s3a://rainforest/delta", database: str = "rainforest"):
+def create_tables(
+    spark, path="s3a://rainforest/delta", database: str = "rainforest"
+):
     spark.sql(f"CREATE DATABASE IF NOT EXISTS {database}")
 
     # User table
     spark.sql(f"DROP TABLE IF EXISTS {database}.user")
-    spark.sql( 
+    spark.sql(
         f"""
         CREATE TABLE {database}.user (
             user_id INT,
@@ -239,7 +241,6 @@ def create_tables(spark, path="s3a://rainforest/delta", database: str = "rainfor
         LOCATION '{path}/clickstream'
     """
     )
-
 
 
 if __name__ == '__main__':

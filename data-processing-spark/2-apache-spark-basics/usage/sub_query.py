@@ -1,6 +1,7 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import sum
 
+
 def run_code(spark):
     print("=================================")
     print("Use the result of a query within a query using sub-queries ")
@@ -51,6 +52,7 @@ def run_code(spark):
 
     # Show the result
     result.show()
+
 
 if __name__ == '__main__':
     spark = (

@@ -1,3 +1,5 @@
+## Cluster management
+
 up:
 	docker compose up --build -d --scale spark-worker=2
 
@@ -9,20 +11,18 @@ restart: down up
 sh:
 	docker exec -ti spark-master bash
 
-meta:
-	PGPASSWORD=sdepassword pgcli -h localhost -p 5432 -U sdeuser -d upstreamdb
+## Data generation
 
 fake-datagen:
 	python3 capstone/upstream_datagen/datagen.py
 
-pyspark:
-	docker exec -ti spark-master bash pyspark --master spark://spark-master:7077 
-
 datagen:
 	docker exec -ti spark-master bash -c 'cd tpch-dbgen && make && ./dbgen -s 1'
 
-spark-sql:
-	docker exec -ti spark-master spark-sql --master spark://spark-master:7077 
+upstream:
+	PGPASSWORD=sdepassword pgcli -h localhost -p 5432 -U sdeuser -d upstreamdb
+
+## Create tables
 
 create-tables:
 	docker exec spark-master spark-sql --master spark://spark-master:7077 --deploy-mode client -f ./setup.sql
@@ -30,10 +30,9 @@ create-tables:
 count-tables:
 	docker exec spark-master spark-sql --master spark://spark-master:7077 --deploy-mode client -f ./count.sql
 
-rainforest:
-	docker exec spark-master spark-submit --master spark://spark-master:7077 --deploy-mode client ./capstone/run_code.py
-
 setup: datagen fake-datagen create-tables 
+
+## Spark UIs: master UI, Spark application UI & History Server UI
 
 hserver-ui:
 	open http://localhost:18080
@@ -41,5 +40,41 @@ hserver-ui:
 ui:
 	open http://localhost:4040
 
+master-ui:
+	open http://localhost:9090
+
+## Start Pyspark and Spark SQL REPL sessions
+
+pyspark:
+	docker exec -ti spark-master bash pyspark --master spark://spark-master:7077 
+
+spark-sql:
+	docker exec -ti spark-master spark-sql --master spark://spark-master:7077 
+
+## Pyspark runner
+
 cr: 
 	@read -p "Enter pyspark relative path:" pyspark_path; docker exec -ti spark-master spark-submit --master spark://spark-master:7077 $$pyspark_path
+
+## Project
+
+rainforest:
+	docker exec spark-master spark-submit --master spark://spark-master:7077 --deploy-mode client ./capstone/run_code.py
+
+## Testing, Linting, Type checks and Formatting
+
+pytest:
+	docker exec -ti spark-master bash -c 'export PYTHONPATH=/opt/spark/work-dir/adventureworks/pipelines && python3 -m pytest --log-cli-level info -p no:warnings -v ./adventureworks/tests'
+
+format:
+	docker exec -ti spark-master bash -c 'python3 -m black -S --line-length 79 --preview ./capstone ./data-processing-spark'
+	docker exec -ti spark-master bash -c 'isort ./data-processing-spark ./capstone'
+
+type:
+	docker exec -ti spark-master bash -c 'python3 -m mypy --no-implicit-reexport --ignore-missing-imports --no-namespace-packages ./adventureworks'
+
+lint:
+	docker exec -ti spark-master bash -c 'flake8 ./data-processing-spark'
+	docker exec -ti spark-master bash -c 'flake8 ./capstone'
+
+ci: format type lint 

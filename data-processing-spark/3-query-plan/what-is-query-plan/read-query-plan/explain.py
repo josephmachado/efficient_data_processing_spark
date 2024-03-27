@@ -1,5 +1,6 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import sum, col
+from pyspark.sql.functions import col, sum
+
 
 def run_code(spark):
     print("=======================================")
@@ -10,7 +11,8 @@ def run_code(spark):
     print("=======================================")
     print("EXPLAIN query")
     print("=======================================")
-    spark.sql("""
+    spark.sql(
+        """
         EXPLAIN
         SELECT
             o.orderkey,
@@ -20,20 +22,30 @@ def run_code(spark):
             JOIN orders o ON l.orderkey = o.orderkey
         GROUP BY
             o.orderkey
-    """).show(truncate=False)
+    """
+    ).show(truncate=False)
 
     print("=======================================")
     print("SELECT query")
     print("=======================================")
-    result_df = spark.table("lineitem").alias("l").join(spark.table("orders").alias("o"), "orderkey") \
-        .groupBy("o.orderkey") \
-        .agg((sum(col("l.extendedprice") * (1 - col("l.discount")))).alias("total_price_wo_tax"))
+    result_df = (
+        spark.table("lineitem")
+        .alias("l")
+        .join(spark.table("orders").alias("o"), "orderkey")
+        .groupBy("o.orderkey")
+        .agg(
+            (sum(col("l.extendedprice") * (1 - col("l.discount")))).alias(
+                "total_price_wo_tax"
+            )
+        )
+    )
     result_df.show()
- 
+
     print("=======================================")
     print("EXPLAIN EXTENDED query")
     print("=======================================")
-    spark.sql("""
+    spark.sql(
+        """
         EXPLAIN EXTENDED 
         SELECT
             o.orderkey,
@@ -43,8 +55,10 @@ def run_code(spark):
             JOIN orders o ON l.orderkey = o.orderkey
         GROUP BY
             o.orderkey
-    """).show(truncate=False)
- 
+    """
+    ).show(truncate=False)
+
+
 if __name__ == '__main__':
     spark = (
         SparkSession.builder.appName("adventureworks")

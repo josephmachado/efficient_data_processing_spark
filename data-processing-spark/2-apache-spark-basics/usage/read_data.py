@@ -1,6 +1,7 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
 
+
 def run_code(spark):
     spark.sql("use tpch")
     print("======================================")
@@ -25,9 +26,11 @@ def run_code(spark):
     print("FILTER")
     print("======================================")
 
-
     print("======================================")
-    print("Read all columns from the 'customer' table where 'nationkey' is 20, limit to 10 rows")
+    print(
+        "Read all columns from the 'customer' table where 'nationkey' is 20,"
+        " limit to 10 rows"
+    )
     print("======================================")
 
     customer_nation_20 = (
@@ -36,7 +39,10 @@ def run_code(spark):
     customer_nation_20.show()
 
     print("======================================")
-    print("Read all columns from the 'customer' table where 'nationkey' is 20 and 'acctbal' > 1000, limit to 10 rows")
+    print(
+        "Read all columns from the 'customer' table where 'nationkey' is 20"
+        " and 'acctbal' > 1000, limit to 10 rows"
+    )
     print("======================================")
 
     customer_nation_20_acctbal_gt_1000 = (
@@ -47,7 +53,10 @@ def run_code(spark):
     customer_nation_20_acctbal_gt_1000.show()
 
     print("======================================")
-    print("Read all columns from the 'customer' table where 'nationkey' is 20 or 'acctbal' > 1000, limit to 10 rows")
+    print(
+        "Read all columns from the 'customer' table where 'nationkey' is 20 or"
+        " 'acctbal' > 1000, limit to 10 rows"
+    )
     print("======================================")
 
     customer_nation_20_or_acctbal_gt_1000 = (
@@ -58,7 +67,10 @@ def run_code(spark):
     customer_nation_20_or_acctbal_gt_1000.show()
 
     print("======================================")
-    print("Read all columns from the 'customer' table where ('nationkey' is 20 and 'acctbal' > 1000) or 'nationkey' is 11, limit to 10 rows")
+    print(
+        "Read all columns from the 'customer' table where ('nationkey' is 20"
+        " and 'acctbal' > 1000) or 'nationkey' is 11, limit to 10 rows"
+    )
     print("======================================")
 
     customer_nation_20_acctbal_gt_1000_or_nationkey_11 = (
@@ -72,7 +84,10 @@ def run_code(spark):
     customer_nation_20_acctbal_gt_1000_or_nationkey_11.show()
 
     print("======================================")
-    print("Read all columns from the 'customer' table where 'nationkey' is in (10, 20)")
+    print(
+        "Read all columns from the 'customer' table where 'nationkey' is in"
+        " (10, 20)"
+    )
     print("======================================")
 
     customer_nation_10_or_20 = spark.table("customer").filter(
@@ -81,7 +96,10 @@ def run_code(spark):
     customer_nation_10_or_20.show()
 
     print("======================================")
-    print("Read all columns from the 'customer' table where 'nationkey' is not in (10, 20)")
+    print(
+        "Read all columns from the 'customer' table where 'nationkey' is not"
+        " in (10, 20)"
+    )
     print("======================================")
 
     customer_nation_not_10_or_20 = spark.table("customer").filter(

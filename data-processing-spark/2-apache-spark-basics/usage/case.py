@@ -1,6 +1,7 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, when
 
+
 def run_code(spark):
     print("=================================")
     print("Replicate IF.ELSE logic with CASE statements")
@@ -15,7 +16,8 @@ def run_code(spark):
         col("totalprice"),
         when(col("totalprice") > 100000, "high")
         .when(
-            (col("totalprice") >= 25000) & (col("totalprice") <= 100000), "medium"
+            (col("totalprice") >= 25000) & (col("totalprice") <= 100000),
+            "medium",
         )
         .otherwise("low")
         .alias("order_price_bucket"),

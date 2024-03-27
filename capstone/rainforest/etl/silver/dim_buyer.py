@@ -1,18 +1,22 @@
+from dataclasses import asdict
 from datetime import datetime
+from typing import List, Optional, Type
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, lit
-from typing import List, Optional, Type
-from dataclasses import asdict
-from rainforest.utils.base_table import ETLDataSet, TableETL
 from rainforest.etl.bronze.appuser import AppUserBronzeETL
 from rainforest.etl.bronze.buyer import BuyerBronzeETL
+from rainforest.utils.base_table import ETLDataSet, TableETL
 
 
 class DimBuyerSilverETL(TableETL):
     def __init__(
         self,
         spark: SparkSession,
-        upstream_table_names: Optional[List[Type[TableETL]]] = [AppUserBronzeETL, BuyerBronzeETL],
+        upstream_table_names: Optional[List[Type[TableETL]]] = [
+            AppUserBronzeETL,
+            BuyerBronzeETL,
+        ],
         name: str = "dim_buyer",
         primary_keys: List[str] = ["buyer_id"],
         storage_path: str = "s3a://rainforest/delta/silver/dim_buyer",
@@ -40,30 +44,46 @@ class DimBuyerSilverETL(TableETL):
             if self.run_upstream:
                 t1.run()
             upstream_etl_datasets.append(t1.read())
-        
+
         return upstream_etl_datasets
 
-    def transform_upstream(self, upstream_datasets: List[ETLDataSet]) -> ETLDataSet:
+    def transform_upstream(
+        self, upstream_datasets: List[ETLDataSet]
+    ) -> ETLDataSet:
         appuser_data = upstream_datasets[0].curr_data
         buyer_data = upstream_datasets[1].curr_data
         current_timestamp = datetime.now()
 
         # Get common columns in both appuser_data and buyer_data
-        common_columns = set(appuser_data.columns).intersection(buyer_data.columns)
+        common_columns = set(appuser_data.columns).intersection(
+            buyer_data.columns
+        )
 
         # Rename common columns in appuser_data to avoid conflicts
         appuser_data = appuser_data.selectExpr(
-            *[f"`{col}` as appuser_{col}" if col in common_columns and col != "user_id" else col for col in appuser_data.columns]
+            *[
+                f"`{col}` as appuser_{col}"
+                if col in common_columns and col != "user_id"
+                else col
+                for col in appuser_data.columns
+            ]
         )
 
         # Rename common columns in buyer_data to avoid conflicts
         buyer_data = buyer_data.selectExpr(
-            *[f"`{col}` as buyer_{col}" if col in common_columns and col != "user_id" else col for col in buyer_data.columns]
+            *[
+                f"`{col}` as buyer_{col}"
+                if col in common_columns and col != "user_id"
+                else col
+                for col in buyer_data.columns
+            ]
         )
 
         # Perform the join based on user_id key
         dim_buyer_data = appuser_data.join(
-            buyer_data, appuser_data["user_id"] == buyer_data["user_id"], "inner"
+            buyer_data,
+            appuser_data["user_id"] == buyer_data["user_id"],
+            "inner",
         )
 
         # Drop the user_id column from the buyer_data DataFrame
@@ -94,29 +114,33 @@ class DimBuyerSilverETL(TableETL):
         dim_buyer_data = data.curr_data
 
         # Write the transformed data to the Delta Lake table
-        dim_buyer_data.write.option("mergeSchema", "true").format(data.data_format).mode("overwrite").partitionBy(
-            data.partition_keys
-        ).save(data.storage_path)
+        dim_buyer_data.write.option("mergeSchema", "true").format(
+            data.data_format
+        ).mode("overwrite").partitionBy(data.partition_keys).save(
+            data.storage_path
+        )
 
     def read(self, partition_keys: Optional[List[str]] = None) -> ETLDataSet:
         # Read the transformed data from the Delta Lake table
-        dim_buyer_data = self.spark.read.format(self.data_format).load(self.storage_path)
+        dim_buyer_data = self.spark.read.format(self.data_format).load(
+            self.storage_path
+        )
 
         # Select the desired columns
         selected_columns = [
-            col('user_id'), 
-            col('username'), 
-            col('email'), 
-            col('is_active'), 
-            col('appuser_created_ts'), 
-            col('appuser_last_updated_by'), 
+            col('user_id'),
+            col('username'),
+            col('email'),
+            col('is_active'),
+            col('appuser_created_ts'),
+            col('appuser_last_updated_by'),
             col('appuser_last_updated_ts'),
-            col('buyer_id'), 
-            col('first_time_purchased_timestamp'), 
-            col('buyer_created_ts'), 
-            col('buyer_last_updated_by'), 
+            col('buyer_id'),
+            col('first_time_purchased_timestamp'),
+            col('buyer_created_ts'),
+            col('buyer_last_updated_by'),
             col('buyer_last_updated_ts'),
-            col('etl_inserted')
+            col('etl_inserted'),
         ]
 
         dim_buyer_data = dim_buyer_data.select(selected_columns)
@@ -133,4 +157,3 @@ class DimBuyerSilverETL(TableETL):
         )
 
         return etl_dataset
-

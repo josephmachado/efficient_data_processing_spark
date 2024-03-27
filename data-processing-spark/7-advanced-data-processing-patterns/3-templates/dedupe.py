@@ -1,6 +1,7 @@
-from pyspark.sql import SparkSession
-from pyspark.sql.functions import round, sum, col, count, date_add, lit, year, avg, row_number
-from pyspark.sql import Window, functions as F
+from pyspark.sql import SparkSession, Window
+from pyspark.sql import functions as F
+from pyspark.sql.functions import (avg, col, count, date_add, lit, round,
+                                   row_number, sum, year)
 
 
 def run_code(spark):
@@ -10,7 +11,7 @@ def run_code(spark):
     spark.sql("USE tpch")
     # Load data into DataFrames
     orders = spark.table("orders")
-    
+
     # Duplicate Orders
     duplicated_orders = orders.union(orders)
 
@@ -18,13 +19,19 @@ def run_code(spark):
     count_ranked_orders = (
         duplicated_orders.withColumn(
             "rn",
-            row_number().over(Window.partitionBy("orderkey").orderBy("orderdate")),
+            row_number().over(
+                Window.partitionBy("orderkey").orderBy("orderdate")
+            ),
         )
         .filter(col("rn") == 1)
         .count()
     )
 
-    print(f"Count of ranked orders with row number is {count_ranked_orders} and original count of orders table is {orders.count()}")
+    print(
+        f"Count of ranked orders with row number is {count_ranked_orders} and"
+        f" original count of orders table is {orders.count()}"
+    )
+
 
 if __name__ == '__main__':
     spark = (
@@ -36,4 +43,3 @@ if __name__ == '__main__':
     spark.sparkContext.setLogLevel("ERROR")
     run_code(spark=spark)
     spark.stop
-

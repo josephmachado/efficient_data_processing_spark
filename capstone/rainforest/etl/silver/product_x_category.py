@@ -1,16 +1,19 @@
 from datetime import datetime
+from typing import List, Optional, Type
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, lit
-from typing import List, Optional, Type
-from rainforest.utils.base_table import ETLDataSet, TableETL
 from rainforest.etl.bronze.productcategory import ProductCategoryBronzeETL
+from rainforest.utils.base_table import ETLDataSet, TableETL
 
 
 class ProductCategorySilverETL(TableETL):
     def __init__(
         self,
         spark: SparkSession,
-        upstream_table_names: Optional[List[Type[TableETL]]] = [ProductCategoryBronzeETL],
+        upstream_table_names: Optional[List[Type[TableETL]]] = [
+            ProductCategoryBronzeETL
+        ],
         name: str = "product_x_category",
         primary_keys: List[str] = ["product_id", "category_id"],
         storage_path: str = "s3a://rainforest/delta/silver/product_x_category",
@@ -38,10 +41,12 @@ class ProductCategorySilverETL(TableETL):
             if self.run_upstream:
                 t1.run()
             upstream_etl_datasets.append(t1.read())
-        
+
         return upstream_etl_datasets
 
-    def transform_upstream(self, upstream_datasets: List[ETLDataSet]) -> ETLDataSet:
+    def transform_upstream(
+        self, upstream_datasets: List[ETLDataSet]
+    ) -> ETLDataSet:
         product_category_data = upstream_datasets[0].curr_data
         current_timestamp = datetime.now()
 
@@ -70,13 +75,17 @@ class ProductCategorySilverETL(TableETL):
         product_category_data = data.curr_data
 
         # Write the transformed data to the Delta Lake table
-        product_category_data.write.option("mergeSchema", "true").format(data.data_format).mode("overwrite").partitionBy(
-            data.partition_keys
-        ).save(data.storage_path)
+        product_category_data.write.option("mergeSchema", "true").format(
+            data.data_format
+        ).mode("overwrite").partitionBy(data.partition_keys).save(
+            data.storage_path
+        )
 
     def read(self, partition_keys: Optional[List[str]] = None) -> ETLDataSet:
         # Read the transformed data from the Delta Lake table
-        product_category_data = self.spark.read.format(self.data_format).load(self.storage_path)
+        product_category_data = self.spark.read.format(self.data_format).load(
+            self.storage_path
+        )
 
         product_category_data = product_category_data.select(
             col("product_id"),

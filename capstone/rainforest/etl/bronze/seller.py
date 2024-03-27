@@ -1,8 +1,9 @@
+from dataclasses import asdict
 from datetime import datetime
+from typing import List, Optional, Type
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, lit
-from typing import List, Optional, Type
-from dataclasses import asdict
 from rainforest.utils.base_table import ETLDataSet, TableETL
 
 
@@ -28,7 +29,7 @@ class SellerBronzeETL(TableETL):
             data_format,
             database,
             partition_keys,
-            run_upstream
+            run_upstream,
         )
 
     def extract_upstream(self) -> List[ETLDataSet]:
@@ -58,7 +59,9 @@ class SellerBronzeETL(TableETL):
 
         return [etl_dataset]
 
-    def transform_upstream(self, upstream_datasets: List[ETLDataSet]) -> ETLDataSet:
+    def transform_upstream(
+        self, upstream_datasets: List[ETLDataSet]
+    ) -> ETLDataSet:
         seller_data = upstream_datasets[0].curr_data
         current_timestamp = datetime.now()
 
@@ -88,13 +91,15 @@ class SellerBronzeETL(TableETL):
         seller_data = data.curr_data
 
         # Write the seller data to the Delta Lake table
-        seller_data.write.format(data.data_format).mode("overwrite").partitionBy(
-            data.partition_keys
-        ).save(data.storage_path)
+        seller_data.write.format(data.data_format).mode(
+            "overwrite"
+        ).partitionBy(data.partition_keys).save(data.storage_path)
 
     def read(self, partition_keys: Optional[List[str]] = None) -> ETLDataSet:
         # Read the seller data from the Delta Lake table
-        seller_data = self.spark.read.format(self.data_format).load(self.storage_path)
+        seller_data = self.spark.read.format(self.data_format).load(
+            self.storage_path
+        )
 
         # Explicitly select columns
         seller_data = seller_data.select(
