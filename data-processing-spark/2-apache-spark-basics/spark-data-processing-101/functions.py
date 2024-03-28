@@ -2,7 +2,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import (ceil, col, concat, date_add, date_format,
                                    datediff, floor, length, lit,
                                    months_between, split, substring, to_date,
-                                   trim, year)
+                                   trim, year, to_timestamp, round, abs)
 
 
 def run_code(spark):
@@ -89,7 +89,8 @@ def run_code(spark):
     print("Parsing '11-05-2023' as date")
     print("=======================================")
     parsed_date_df = fake_df.select(
-        to_date(lit('11-05-2023'), 'MM-dd-yyyy').alias("parsed_date")
+        to_date(lit('11-05-2023'), 'MM-dd-yyyy').alias("parsed_date"),
+        to_timestamp(lit('11-05-2023'), 'MM-dd-yyyy').alias("parsed_date")
     )
     parsed_date_df.show()
 
