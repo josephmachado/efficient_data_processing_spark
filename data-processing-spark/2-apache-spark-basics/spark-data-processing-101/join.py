@@ -177,6 +177,22 @@ def run_code(spark):
     )
     cross_join_result.show()
 
+    print("======================================")
+    print("LEFT ANTI JOIN")
+    print("======================================")
+    # Load tables
+    nation = spark.table("nation")
+    supplier = spark.table("supplier")
+
+    # Perform LEFT ANTI JOIN
+    result = nation.join(supplier, nation["nationkey"] == supplier["suppkey"], "left_anti")
+
+    # Select columns from nation table
+    result = result.select(nation["nationkey"], nation["name"], nation["regionkey"], nation["comment"])
+
+    # Show the result
+    result.show()
+
     # Exercise
     # Time taken: 4.489 seconds, Fetched 71856 row(s)
     exercise_result = (
@@ -195,6 +211,7 @@ def run_code(spark):
         .select("o1.custkey")
     )
     exercise_result.show()
+
 
 
 if __name__ == '__main__':
