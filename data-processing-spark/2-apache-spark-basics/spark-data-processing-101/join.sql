@@ -104,3 +104,13 @@ SELECT
 FROM
     nation n
     CROSS JOIN region r;
+
+-- LEFT ANTI JOIN
+USE tpch;
+
+-- suppkey starts from 1, where as nationkey starts from 0
+SELECT n.* 
+FROM nation n 
+LEFT ANTI JOIN supplier s 
+ON n.nationkey = s.suppkey;
+-- this is not the right key to join on, but done to demonstrate left anti join
