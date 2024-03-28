@@ -20,6 +20,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 COPY ./conf/spark-defaults.conf "$SPARK_HOME/conf/spark-defaults.conf"
+COPY ./conf/metrics.properties "$SPARK_HOME/conf/metrics.properties"
 ENV SPARK_CONF_DIR="$SPARK_HOME/conf"
 ENV SPARK_MASTER="spark://spark-master:7077"
 ENV SPARK_MASTER_HOST spark-master
