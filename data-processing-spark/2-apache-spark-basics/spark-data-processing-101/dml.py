@@ -13,7 +13,7 @@ def run_code(spark):
     spark.sql(
         """
         CREATE TABLE sample_table2 (sample_key bigint, sample_status STRING)
-        USING delta
+        USING delta LOCATION 's3a://tpch/sample_table2'
     """
     )
 

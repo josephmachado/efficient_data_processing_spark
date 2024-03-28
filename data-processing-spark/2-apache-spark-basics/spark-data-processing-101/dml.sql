@@ -2,7 +2,8 @@ USE tpch;
 
 DROP TABLE IF EXISTS sample_table2;
 
-CREATE TABLE sample_table2 (sample_key bigint, sample_status STRING) USING delta;
+CREATE TABLE sample_table2 (sample_key bigint, sample_status STRING) USING delta LOCATION 's3a://tpch/sample_table2';
+
 
 SELECT
     *
