@@ -19,7 +19,7 @@ SELECT
 
 SELECT DATE '2022-11-05' + INTERVAL '10' DAY;
 
-SELECT TO_DATE('11-05-2023', 'MM-dd-yyyy') AS parsed_date;
+SELECT TO_DATE('11-05-2023', 'MM-dd-yyyy') AS parsed_date, to_timestamp('11-05-2023', 'MM-dd-yyyy') as parsed_ts;
 
 SELECT date_format(orderdate, 'yyyy-MM-01') AS first_month_date FROM orders LIMIT 5; 
 
