@@ -64,7 +64,7 @@ rainforest:
 ## Testing, Linting, Type checks and Formatting
 
 pytest:
-	docker exec -ti spark-master bash -c 'export PYTHONPATH=/opt/spark/work-dir/adventureworks/pipelines && python3 -m pytest --log-cli-level info -p no:warnings -v ./adventureworks/tests'
+	docker exec -ti spark-master bash -c 'export PYTHONPATH=/opt/spark/work-dir/efficient-data-processing-spark/pipelines && python3 -m pytest --log-cli-level info -p no:warnings -v ./efficient-data-processing-spark/tests'
 
 format:
 	docker exec spark-master black -S --line-length 79 --preview ./capstone ./data-processing-spark

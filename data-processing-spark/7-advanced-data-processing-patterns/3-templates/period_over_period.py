@@ -45,7 +45,7 @@ def run_code(spark):
 
 if __name__ == '__main__':
     spark = (
-        SparkSession.builder.appName("adventureworks")
+        SparkSession.builder.appName("efficient-data-processing-spark")
         .enableHiveSupport()
         .getOrCreate()
     )
