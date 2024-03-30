@@ -18,7 +18,5 @@ SELECT
 FROM
     orders
 GROUP BY
-    orderpriority
-ORDER BY
     orderpriority;
--- Note that this query plan involves 2 Shuffles (aka Exchange). One for grouping and the secod for ordering
+-- Note that this query plan involves an Exchange

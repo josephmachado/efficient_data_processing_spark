@@ -4,29 +4,10 @@ SELECT "***********************BROADCAST HASH JOIN****************";
 EXPLAIN
 SELECT
     c.name AS customer_name,
-    o.orderdate,
-    SUM(o.totalprice) AS total_price,
-    -- We have it here just for comparison purposes
-    ROUND(
-        SUM(SUM(o.totalprice)) over(
-            PARTITION by o.custkey
-            ORDER BY
-                o.orderdate
-        ),
-        2
-    ) AS cumulative_sum_total_price
-FROM
+    o.orderdate
+   FROM
     orders o
-    JOIN customer c ON o.custkey = c.custkey
-GROUP BY
-    c.name,
-    o.custkey,
-    o.orderdate
-ORDER BY
-    o.custkey,
-    o.orderdate
-LIMIT
-    20;
+    JOIN customer c ON o.custkey = c.custkey;
 -- Notice the BroadcastHashJoin
 -- The customer table being small, it is chose to be BroadcastExchanged to all the nodes that have orders data
 -- In the respective nodes orders data is joined with the boradcasted customer table
@@ -35,36 +16,22 @@ LIMIT
 SELECT "***********************SORT MERGE JOIN****************";
 EXPLAIN
 SELECT
-    YEAR(o.orderdate) AS order_year,
-    MONTH(o.orderdate) AS order_month,
-    SUM(l.quantity) AS total_qty
+    o.orderdate,
+    l.linestatus
 FROM
     orders o
-    JOIN lineitem l ON o.orderkey = l.orderkey
-GROUP BY
-    YEAR(o.orderdate),
-    MONTH(o.orderdate);
+    JOIN lineitem l ON o.orderkey = l.orderkey;
 -- In this join we have 2 large tables that are shuffled (exchanged) across node in the cluster
 -- sorted within the nodes based on join key (orderkey)
 -- The rows are merged by iterating over the rows of the tables
 
-/*
-SELECT "We set spark.sql.join.preferSortMergeJoin to false to trigger a SHUFFLE HASH JOIN";
-SET spark.sql.join.preferSortMergeJoin=false;
-
 SELECT "***********************SHUFFLE HASH JOIN****************";
-EXPLAIN
-SELECT /*+ SHUFFLE_HASH(orderdate) */
-    YEAR(o.orderdate) AS order_year,
-    MONTH(o.orderdate) AS order_month,
-    SUM(l.quantity) AS total_qty
-FROM
-    orders o
-    JOIN lineitem l ON o.orderkey = l.orderkey
-GROUP BY
-    YEAR(o.orderdate),
-    MONTH(o.orderdate);
-*/
+EXPLAIN SELECT /*+ SHUFFLE_HASH(l) */ l.linestatus
+, ps.supplycost
+FROM lineitem l
+JOIN partsupp ps
+ON l.partkey = ps.partkey AND l.suppkey = ps.suppkey; 
+
 
 SELECT "*****************BROADCAST NESTEDLOOP JOIN********************"
 EXPLAIN 
