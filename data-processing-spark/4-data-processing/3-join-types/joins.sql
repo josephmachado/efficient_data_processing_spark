@@ -55,3 +55,26 @@ CROSS JOIN lineitem l;
 -- orders and lineitem table are large and the join is a cross join
 -- due to the nature of the join we have to do a cartesian product of both the
 -- tables 
+
+SELECT "*****************JOIN HINTS********************"
+
+EXPLAIN SELECT l.linestatus
+, ps.supplycost
+FROM partsupp ps
+JOIN lineitem l
+ON l.partkey = ps.partkey AND l.suppkey = ps.suppkey; 
+-- SortMergeJoin
+
+EXPLAIN SELECT  /*+ BROADCAST(ps) */ l.linestatus
+, ps.supplycost
+FROM partsupp ps
+JOIN lineitem l
+ON l.partkey = ps.partkey AND l.suppkey = ps.suppkey; 
+-- this will trigger a broadcast join with the partsupp table as the build side
+
+EXPLAIN SELECT  /*+ SHUFFLE_REPLICATE_NL(ps) */ l.linestatus
+, ps.supplycost
+FROM partsupp ps
+JOIN lineitem l
+ON l.partkey = ps.partkey AND l.suppkey = ps.suppkey; 
+-- this will trigger a Shuffle replicate (aka cartesian product join) join
