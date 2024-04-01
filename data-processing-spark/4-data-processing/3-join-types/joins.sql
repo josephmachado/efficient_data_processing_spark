@@ -2,15 +2,15 @@ use tpch;
 
 SELECT "***********************BROADCAST HASH JOIN****************";
 EXPLAIN
-SELECT
-    c.name AS customer_name,
-    o.orderdate
-   FROM
-    orders o
-    JOIN customer c ON o.custkey = c.custkey;
+SELECT 
+s.name AS supplier_name,
+l.linenumber,
+ROUND(l.extendedprice * (1 - l.discount), 2) AS total_price_wo_tax
+FROM lineitem l
+JOIN supplier s ON l.suppkey = s.suppkey;
 -- Notice the BroadcastHashJoin
--- The customer table being small, it is chose to be BroadcastExchanged to all the nodes that have orders data
--- In the respective nodes orders data is joined with the boradcasted customer table
+-- The supplier table being small, it is chose to be BroadcastExchanged to all the nodes that have lineitem data
+-- In the respective nodes lineitem data is joined with the broaddcasted supplier table
 
 
 SELECT "***********************SORT MERGE JOIN****************";
@@ -26,22 +26,24 @@ FROM
 -- The rows are merged by iterating over the rows of the tables
 
 SELECT "***********************SHUFFLE HASH JOIN****************";
-EXPLAIN SELECT /*+ SHUFFLE_HASH(l) */ l.linestatus
+EXPLAIN SELECT /*+ SHUFFLE_HASH(ps) */ l.linestatus
 , ps.supplycost
-FROM lineitem l
-JOIN partsupp ps
+FROM partsupp ps
+JOIN lineitem l
 ON l.partkey = ps.partkey AND l.suppkey = ps.suppkey; 
 
-
 SELECT "*****************BROADCAST NESTEDLOOP JOIN********************"
-EXPLAIN 
-SELECT n.name, r.name
-FROM nation n
-CROSS JOIN region r;
-
--- Both the nation and region tables are small enough to be broadcasted and
--- since we are doing a cross join(every row of nation matched with every row of region)
--- a loop is the appropriate choice for the join 
+EXPLAIN
+SELECT 
+s.name AS supplier_name,
+l.linenumber,
+ROUND(l.extendedprice * (1 - l.discount), 2) AS total_price_wo_tax
+FROM lineitem l
+JOIN supplier s ON l.suppkey >= s.suppkey;
+-- The query plan shows a `BuildRight` which means that the right table (Supplier) is broadcasted
+-- After broadcast there is a nested loop join. We cannot use a broadcast hash join due to the type of join criteria
+-- Since Hash join requires ability to match data based on equality of hash values and that is not possible with a non-equi join (>=) 
+-- Note: this is the same query we used to show broadcast hash join, but with a non-equi join (>=) type
 
 SELECT "*****************CARTESIAN PRODUCT********************"
 
