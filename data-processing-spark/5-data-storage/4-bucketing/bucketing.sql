@@ -1,3 +1,5 @@
+CREATE SCHEMA IF NOT EXISTS minio;
+
 DROP TABLE IF EXISTS minio.lineitem_w_encoding_w_bucketing;
 
 CREATE TABLE minio.lineitem_w_encoding_w_bucketing (
@@ -17,7 +19,7 @@ CREATE TABLE minio.lineitem_w_encoding_w_bucketing (
     returnflag varchar(1),
     shipdate date,
     receiptdate date
-) USING parquet CLUSTERED BY (quantity) INTO 75 BUCKETS LOCATION 's3a://tpch/lineitem_w_encoding_w_bucketing/';
+) USING parquet CLUSTERED BY (extendedprice) INTO 15 BUCKETS LOCATION 's3a://tpch/lineitem_w_encoding_w_bucketing/';
 
 INSERT INTO
     minio.lineitem_w_encoding_w_bucketing
@@ -41,26 +43,16 @@ SELECT
 FROM
     tpch.lineitem;
 
-SELECT
-    COUNT(*)
-FROM
-    tpch.lineitem
-WHERE
-    quantity >= 30
-    AND quantity <= 45;
--- 1,921,968
--- Time taken: 1.89 seconds, Fetched 1 row(s)
-
-SELECT
-    *
+EXPLAIN SELECT *
 FROM
     minio.lineitem_w_encoding_w_bucketing
 WHERE
     quantity >= 30
     AND quantity <= 45;
--- 1,921,968
--- Time taken: 2 seconds, Fetched 1 row(s)
 
-
-
-
+EXPLAIN SELECT *
+FROM
+    tpch.lineitem_w_encoding
+WHERE
+    quantity >= 30
+    AND quantity <= 45;
