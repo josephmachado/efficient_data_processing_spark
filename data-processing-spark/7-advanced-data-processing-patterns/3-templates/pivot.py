@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import avg, col, round
+from pyspark.sql.functions import avg, col, round, sum
 
 
 def run_code(spark):
@@ -13,7 +13,9 @@ def run_code(spark):
     orders_df = spark.table("orders")
 
     # Select relevant columns from orders_df
-    order_data = orders_df.select("orderdate", "totalprice", "orderpriority")
+    order_data =  orders_df.groupBy("orderdate", "orderpriority") \
+                     .agg(sum("totalprice").alias("totalprice"))
+    #orders_df.select("orderdate", "totalprice", "orderpriority")
 
     # Pivot the order_data DataFrame
     pivot_result = (
