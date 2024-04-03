@@ -4,7 +4,7 @@ from pyspark.sql.functions import col, row_number
 
 def run_code(spark):
     print("==========================================")
-    print("De-duplicate rows with window function")
+    print("De-duplicate rows with dropDuplicates function")
     print("=================================")
     spark.sql("USE tpch")
     # Load data into DataFrames
@@ -12,21 +12,10 @@ def run_code(spark):
 
     # Duplicate Orders
     duplicated_orders = orders.union(orders)
-
-    # Count orders with row number = 1
-    count_ranked_orders = (
-        duplicated_orders.withColumn(
-            "rn",
-            row_number().over(
-                Window.partitionBy("orderkey").orderBy("orderdate")
-            ),
-        )
-        .filter(col("rn") == 1)
-        .count()
-    )
+    deduped_orders = duplicated_orders.dropDuplicates(['orderkey'])
 
     print(
-        f"Count of ranked orders with row number is {count_ranked_orders} and"
+        f"Count of ranked orders with row number is {deduped_orders.count()} and"
         f" original count of orders table is {orders.count()}"
     )
 
