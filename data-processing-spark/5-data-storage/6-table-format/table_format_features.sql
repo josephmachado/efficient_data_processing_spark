@@ -1,5 +1,4 @@
 -- Create a delta table
-
 USE tpch;
 DROP TABLE IF EXISTS delta_lineitem;
 
@@ -24,7 +23,9 @@ CREATE TABLE delta_lineitem(
 TBLPROPERTIES (
    'delta.columnMapping.mode' = 'name',
    'delta.minReaderVersion' = '2',
-   'delta.minWriterVersion' = '5');
+   'delta.minWriterVersion' = '5',
+   'delta.deletedFileRetentionDuration'='5s', -- defaults to 7days
+   );
 
 INSERT INTO
     delta_lineitem
@@ -51,9 +52,7 @@ FROM
 -- Look at versions
 DESCRIBE HISTORY delta_lineitem;
 
--- Insert a few row
--- Create a delta table
-
+-- Insert a few rows
 INSERT INTO
     delta_lineitem
 SELECT
@@ -86,20 +85,37 @@ DESCRIBE HISTORY delta_lineitem;
 -- Current count
 select count(*) from delta_lineitem;
 -- 6,002,215
-select count(*) from delta_lineitem TIMESTAMP AS OF '2024-03-22 13:13:38';
+-- GET TIMESTAMP FROM the second column in the "DESCRIBE HISTORY delta_lineitem" query;
+select count(*) from delta_lineitem TIMESTAMP AS OF '2024-03-22 13:13:38'; 
 -- 6,001,215
 select count(*) from delta_lineitem VERSION AS OF 1;
 -- 6,001,215
 
+-------------------- SCHEMA EVOLUTION --------------------------
 -- Schema evolution
 ALTER TABLE delta_lineitem  ADD COLUMN phonenumber STRING;
 ALTER TABLE delta_lineitem  DROP COLUMN COMMENT;
 
+-- latest (based on id) rows will the add column and drop column form above
 DESCRIBE HISTORY delta_lineitem;
+
+-- let's see what delta_lineitem looks like
+DESCRIBE delta_lineitem;
+
+-- we can see the deleted column with time travel
+SELECT comment FROM delta_lineitem VERSION AS OF 3 LIMIT 5;
+
+-------------------- UPDATE, DELTES & MERGES --------------------------
 
 -- Updates, Deletes and Merge into
 DELETE FROM delta_lineitem WHERE shipmode = 'TRUCK';
 UPDATE delta_lineitem SET shipmode = 'AIR' WHERE shipmode = 'REG AIR';
+
+DESCRIBE HISTORY delta_lineitem;
+
+VACUUM delta_lineitem;
+
+DESCRIBE HISTORY delta_lineitem;
 
 -- MERGE INTO / UPSERT INTO especially useful for dimension table updates and inserts but done at the same time
 -- let's use nation table as an example
@@ -107,8 +123,7 @@ UPDATE delta_lineitem SET shipmode = 'AIR' WHERE shipmode = 'REG AIR';
 CREATE TABLE delta_nation (
     nationkey Long,
     name STRING,
-    regionkey Long,
-    COMMENT STRING
+    ACTIVE INT
 ) USING DELTA LOCATION 's3a://tpch/delta_nation/' 
 TBLPROPERTIES (
    'delta.columnMapping.mode' = 'name',
@@ -118,15 +133,17 @@ TBLPROPERTIES (
 INSERT INTO delta_nation
 SELECT nationkey
 , name
-, regionkey
-, COMMENT
-FROM nation;
-
+, 1
+FROM nation
+WHERE name like 'A%';
 
 MERGE INTO delta_nation
 USING nation
 on delta_nation.nationkey = nation.nationkey
 WHEN MATCHED THEN UPDATE SET 
-delta_nation.name = CONCAT(nation.name, '_', 'NEW_NATION');
+delta_nation.name = CONCAT(nation.name, '_', 'A_NATION'),
+delta_nation.active = 1
+WHEN NOT MATCHED THEN
+INSERT (nationkey, name, active) VALUES (nation.nationkey, nation.name, 1);
 
 SELECT DISTINCT name FROM delta_nation;
