@@ -1,6 +1,9 @@
 USE tpch;
 
-CREATE TABLE lineitem_w_encoding_w_bucketing (
+DROP TABLE IF EXISTS lineitem_w_encoding;
+
+-- make sure that the folder is deleted at minio http://localhost:9000
+CREATE TABLE lineitem_w_encoding (
     orderkey bigint,
     partkey bigint,
     suppkey bigint,
@@ -17,12 +20,10 @@ CREATE TABLE lineitem_w_encoding_w_bucketing (
     returnflag varchar(1),
     shipdate date,
     receiptdate date
-) USING parquet 
-CLUSTERED BY (quantity) 
-INTO 5 BUCKETS LOCATION 's3a://tpch/lineitem_w_encoding_w_bucketing/';
+) USING parquet LOCATION 's3a://tpch/lineitem_w_encoding/';
 
 INSERT INTO
-    lineitem_w_encoding_w_bucketing
+    lineitem_w_encoding
 SELECT
     orderkey,
     partkey,
@@ -43,20 +44,12 @@ SELECT
 FROM
     tpch.lineitem;
 
-ANALYZE TABLE lineitem_w_encoding_w_bucketing COMPUTE STATISTICS FOR ALL COLUMNS; 
+ANALYZE TABLE lineitem_w_encoding COMPUTE STATISTICS;
 
-EXPLAIN SELECT quantity
-, count(1) as cnt
-FROM
-    lineitem_w_encoding_w_bucketing
-WHERE
-    quantity IN (1, 10, 20, 15, 24, 69)
-GROUP BY 1;
+DESC EXTENDED lineitem_w_encoding;
+-- Notice the metadata "Statistics 211837833 bytes, 6001215 rows" 
+-- this is about 211MB
 
-EXPLAIN SELECT quantity
-, count(1) as cnt
-FROM
-    tpch.lineitem
-WHERE
-    quantity IN (1, 10, 20, 15, 24, 69)
-GROUP BY 1;
+DESC EXTENDED lineitem_w_sorting;
+-- Notice the metadata "Statistics 200505631 bytes, 6001215 rows"
+-- This is about 200MB
