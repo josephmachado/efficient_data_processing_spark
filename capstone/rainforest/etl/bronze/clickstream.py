@@ -75,9 +75,9 @@ class ClickstreamBronzeETL(TableETL):
 
         return etl_dataset
 
-    def validate(self, data: ETLDataSet) -> bool:
-        # Perform any necessary validation checks on the clickstream data
-        return True
+    
+        
+        
 
     def load(self, data: ETLDataSet) -> None:
         clickstream_data = data.curr_data

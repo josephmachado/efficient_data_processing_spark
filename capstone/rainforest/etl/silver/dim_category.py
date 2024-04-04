@@ -67,9 +67,9 @@ class DimCategorySilverETL(TableETL):
 
         return etl_dataset
 
-    def validate(self, data: ETLDataSet) -> bool:
-        # Perform any necessary validation checks on the transformed data
-        return True
+    
+        
+        
 
     def load(self, data: ETLDataSet) -> None:
         dim_category_data = data.curr_data

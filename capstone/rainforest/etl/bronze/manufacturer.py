@@ -76,9 +76,9 @@ class ManufacturerBronzeETL(TableETL):
 
         return etl_dataset
 
-    def validate(self, data: ETLDataSet) -> bool:
-        # Perform any necessary validation checks on the manufacturer data
-        return True
+    
+        
+        
 
     def load(self, data: ETLDataSet) -> None:
         manufacturer_data = data.curr_data

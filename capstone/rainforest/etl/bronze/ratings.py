@@ -76,9 +76,9 @@ class RatingsBronzeETL(TableETL):
 
         return etl_dataset
 
-    def validate(self, data: ETLDataSet) -> bool:
-        # Perform any necessary validation checks on the ratings data
-        return True
+    
+        
+        
 
     def load(self, data: ETLDataSet) -> None:
         ratings_data = data.curr_data

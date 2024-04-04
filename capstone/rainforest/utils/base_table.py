@@ -57,10 +57,9 @@ class TableETL(ABC):
 
     def validate(self, data: ETLDataSet) -> bool:
         file_path = Path(f"capstone/rainforest/great_expectations/expectations/{self.name}.json")
-
+        
         if file_path.exists():
-            # validate
-            # Perform any necessary validation checks on the transformed data
+            # validate    
             context = gx.get_context(
                 context_root_dir=os.path.join(
                     os.getcwd(),
@@ -69,7 +68,6 @@ class TableETL(ABC):
                     "great_expectations",
                 )
             )
-
             validations = []
             validations.append(
                 {
@@ -82,7 +80,6 @@ class TableETL(ABC):
             return context.run_checkpoint(
                 checkpoint_name="dq_checkpoint", validations=validations
             ).list_validation_results()
-
         else:
             return True
 

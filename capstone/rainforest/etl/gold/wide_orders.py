@@ -80,9 +80,9 @@ class WideOrdersGoldETL(TableETL):
 
         return etl_dataset
 
-    def validate(self, data: ETLDataSet) -> bool:
-        # Perform any necessary validation checks on the transformed data
-        return True
+    
+        
+        
 
     def load(self, data: ETLDataSet) -> None:
         wide_orders_data = data.curr_data

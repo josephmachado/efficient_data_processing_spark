@@ -77,9 +77,9 @@ class BrandBronzeETL(TableETL):
 
         return etl_dataset
 
-    def validate(self, data: ETLDataSet) -> bool:
-        # Perform any necessary validation checks on the brand data
-        return True
+    
+        
+        
 
     def load(self, data: ETLDataSet) -> None:
         brand_data = data.curr_data
