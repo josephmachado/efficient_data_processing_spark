@@ -1,0 +1,22 @@
+{
+  "data_asset_type": null,
+  "expectation_suite_name": "orders",
+  "expectations": [
+    {
+      "expectation_type": "expect_column_values_to_be_unique",
+      "kwargs": {
+        "column": "order_id"
+      },
+      "meta": {
+        "notes": {
+          "content": "order_id column is expected to be unique",
+          "format": "markdown"
+        }
+      }
+    }
+  ],
+  "ge_cloud_id": null,
+  "meta": {
+    "great_expectations_version": "0.17.10+0.g0d308ac69.dirty"
+  }
+}

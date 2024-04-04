@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import os
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Type
+from pathlib import Path
 
 from pyspark.sql import DataFrame
+import great_expectations as gx
 
 
 @dataclass
@@ -52,9 +55,36 @@ class TableETL(ABC):
     ) -> ETLDataSet:
         pass
 
-    @abstractmethod
     def validate(self, data: ETLDataSet) -> bool:
-        pass
+        file_path = Path(f"capstone/rainforest/great_expectations/expectations/{self.name}.json")
+
+        if file_path.exists():
+            # validate
+            # Perform any necessary validation checks on the transformed data
+            context = gx.get_context(
+                context_root_dir=os.path.join(
+                    os.getcwd(),
+                    "capstone",
+                    "rainforest",
+                    "great_expectations",
+                )
+            )
+
+            validations = []
+            validations.append(
+                {
+                    "batch_request": context.get_datasource("spark_datasource")
+                    .get_asset(self.name)
+                    .build_batch_request(dataframe=data.curr_data),
+                    "expectation_suite_name": self.name,
+                }
+            )
+            return context.run_checkpoint(
+                checkpoint_name="dq_checkpoint", validations=validations
+            ).list_validation_results()
+
+        else:
+            return True
 
     @abstractmethod
     def load(self, data: ETLDataSet) -> None:

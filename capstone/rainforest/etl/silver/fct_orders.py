@@ -3,7 +3,7 @@ from typing import Dict, List, Optional, Type
 
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, lit
-from rainforest.etl.bronze.orders import OrdersSilverETL
+from rainforest.etl.bronze.orders import OrdersBronzeETL
 from rainforest.utils.base_table import ETLDataSet, TableETL
 
 
@@ -12,7 +12,7 @@ class FactOrdersSilverETL(TableETL):
         self,
         spark: SparkSession,
         upstream_table_names: Optional[List[Type[TableETL]]] = [
-            OrdersSilverETL
+            OrdersBronzeETL
         ],
         name: str = "fact_orders",
         primary_keys: List[str] = ["order_id"],

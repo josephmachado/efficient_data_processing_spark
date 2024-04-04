@@ -1,18 +1,20 @@
+import os
 from datetime import datetime
 from typing import Dict, List, Optional, Type
 
+import great_expectations as gx
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, lit
 from rainforest.utils.base_table import ETLDataSet, TableETL
 from rainforest.utils.db import get_upstream_table
 
 
-class OrdersSilverETL(TableETL):
+class OrdersBronzeETL(TableETL):
     def __init__(
         self,
         spark: SparkSession,
         upstream_table_names: Optional[List[Type[TableETL]]] = None,
-        name: str = "fact_orders",
+        name: str = "orders",
         primary_keys: List[str] = ["order_id"],
         storage_path: str = "s3a://rainforest/delta/bronze/orders",
         data_format: str = "delta",
@@ -76,10 +78,6 @@ class OrdersSilverETL(TableETL):
         )
 
         return etl_dataset
-
-    def validate(self, data: ETLDataSet) -> bool:
-        # Perform any necessary validation checks on the transformed data
-        return True
 
     def load(self, data: ETLDataSet) -> None:
         order_data = data.curr_data
