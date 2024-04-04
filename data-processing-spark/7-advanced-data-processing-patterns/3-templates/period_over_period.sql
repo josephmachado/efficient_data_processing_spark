@@ -2,12 +2,12 @@ USE tpch;
 
 WITH monthly_orders AS (
     SELECT
-        concat(extract(year from orderdate) ,'-', extract(month from orderdate)) AS ordermonth,
+        date_format(orderdate, 'y-M') AS ordermonth,
         ROUND(SUM(totalprice) / 100000, 2) AS totalprice
     FROM
         orders
     GROUP BY
-        concat(extract(year from orderdate) ,'-', extract(month from orderdate))
+        date_format(orderdate, 'y-M')
 )
 SELECT
     ordermonth,
