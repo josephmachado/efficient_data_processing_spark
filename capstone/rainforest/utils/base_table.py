@@ -3,11 +3,11 @@ from __future__ import annotations
 import os
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Type
 from pathlib import Path
+from typing import Dict, List, Optional, Type
 
-from pyspark.sql import DataFrame
 import great_expectations as gx
+from pyspark.sql import DataFrame
 
 
 @dataclass
@@ -56,10 +56,12 @@ class TableETL(ABC):
         pass
 
     def validate(self, data: ETLDataSet) -> bool:
-        file_path = Path(f"capstone/rainforest/great_expectations/expectations/{self.name}.json")
-        
+        ge_path = "capstone/rainforest/great_expectations"
+        expc_json_path = f"{ge_path}/expectations/{self.name}.json"
+        file_path = Path(expc_json_path)
+
         if file_path.exists():
-            # validate    
+            # validate
             context = gx.get_context(
                 context_root_dir=os.path.join(
                     os.getcwd(),

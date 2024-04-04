@@ -139,10 +139,6 @@ class DimProductSilverETL(TableETL):
 
         return etl_dataset
 
-    
-        
-        
-
     def load(self, data: ETLDataSet) -> None:
         dim_product_data = data.curr_data
 

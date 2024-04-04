@@ -10,17 +10,23 @@ def run_code(spark):
     orders = spark.table("tpch.orders")
 
     # Job 1: Query 1 - Perform a simple aggregation on the lineitem table
-    lineitem_agg = lineitem.groupBy("returnflag", "linestatus") \
-        .agg({"quantity": "sum", "extendedprice": "sum"}) \
-        .withColumnRenamed("sum(quantity)", "sum_qty") \
+    lineitem_agg = (
+        lineitem.groupBy("returnflag", "linestatus")
+        .agg({"quantity": "sum", "extendedprice": "sum"})
+        .withColumnRenamed("sum(quantity)", "sum_qty")
         .withColumnRenamed("sum(extendedprice)", "sum_base_price")
+    )
 
     # Job 2: Query 2 - Join lineitem with orders and perform aggregation
-    joined_data = lineitem.join(orders, lineitem.orderkey == orders.orderkey, "inner")
-    order_agg = joined_data.groupBy("returnflag", "orderpriority") \
-        .agg({"quantity": "avg", "extendedprice": "avg"}) \
-        .withColumnRenamed("avg(quantity)", "avg_qty") \
+    joined_data = lineitem.join(
+        orders, lineitem.orderkey == orders.orderkey, "inner"
+    )
+    order_agg = (
+        joined_data.groupBy("returnflag", "orderpriority")
+        .agg({"quantity": "avg", "extendedprice": "avg"})
+        .withColumnRenamed("avg(quantity)", "avg_qty")
         .withColumnRenamed("avg(extendedprice)", "avg_price")
+    )
 
     # Show the results of both queries
     print("==========================================")
@@ -33,6 +39,7 @@ def run_code(spark):
     print("==========================================")
     order_agg.explain()
     order_agg.show()
+
 
 if __name__ == '__main__':
     spark = (

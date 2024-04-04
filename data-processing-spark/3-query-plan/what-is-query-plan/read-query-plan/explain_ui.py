@@ -12,11 +12,10 @@ def run_code(spark):
         .alias("l")
         .join(spark.table("orders").alias("o"), "orderkey")
         .groupBy("o.orderkey")
-        .agg(
-            (sum(col("l.extendedprice") * (1 - col("l.discount"))))
-        )
+        .agg((sum(col("l.extendedprice") * (1 - col("l.discount")))))
     )
     result_df.show()
+
 
 if __name__ == '__main__':
     spark = (

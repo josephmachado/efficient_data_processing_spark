@@ -81,10 +81,6 @@ class DailyOrderMetricsGoldETL(TableETL):
 
         return etl_dataset
 
-    
-        
-        
-
     def load(self, data: ETLDataSet) -> None:
         daily_metrics_data = data.curr_data
 

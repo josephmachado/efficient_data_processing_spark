@@ -77,10 +77,6 @@ class ProductCategoryBronzeETL(TableETL):
 
         return etl_dataset
 
-    
-        
-        
-
     def load(self, data: ETLDataSet) -> None:
         product_category_data = data.curr_data
 

@@ -7,7 +7,8 @@ def run_code(spark):
     print([i for i in range(10)])
     # Get orderstatus counts
     orders = spark.sql(
-        "select orderstatus, count(*) as cnt from tpch.orders GROUP BY orderstatus"
+        "select orderstatus, count(*) as cnt from tpch.orders GROUP BY"
+        " orderstatus"
     )
 
     # Data is not processed yet,
@@ -16,14 +17,16 @@ def run_code(spark):
     )  # only when this line is executed data is processed
 
     lineitem = spark.sql(
-    """select linestatus, 
-    count(*) as cnt 
-    from tpch.lineitem
+        """select linestatus,
+    count(*) as cnt
+     from tpch.lineitem
      GROUP BY linestatus
-    """)
+    """
+    )
     filtered_lineitem = lineitem.filter(col("linestatus") != "O")
 
     filtered_lineitem.explain()
+
 
 if __name__ == '__main__':
     spark = (

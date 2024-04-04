@@ -75,10 +75,6 @@ class AppUserBronzeETL(TableETL):
 
         return etl_dataset
 
-    
-        
-        
-
     def load(self, data: ETLDataSet) -> None:
         user_data = data.curr_data
 

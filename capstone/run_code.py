@@ -6,15 +6,9 @@ from rainforest.etl.interface.daily_category_report import \
     create_daily_category_report_view
 from rainforest.etl.interface.daily_order_report import \
     create_daily_order_report_view
-from rainforest.etl.bronze.orders import OrdersBronzeETL
 
 
 def run_code(spark):
-    print("Bronze orders table with data quality checks")
-    bronze_orders = OrdersBronzeETL(spark=spark)
-    bronze_orders.run()
-    bronze_orders.read().curr_data.show()
-    """
     print("=================================")
     print("Daily Category Report")
     print("=================================")
@@ -30,7 +24,7 @@ def run_code(spark):
     gold_daily_order_metrics.run()
     create_daily_order_report_view(gold_daily_order_metrics.read().curr_data)
     spark.sql("select * from global_temp.daily_order_report").show()
-    """
+
 
 if __name__ == "__main__":
     # Create a spark session

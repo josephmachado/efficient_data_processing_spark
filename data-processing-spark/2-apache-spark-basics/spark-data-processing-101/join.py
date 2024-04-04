@@ -185,10 +185,17 @@ def run_code(spark):
     supplier = spark.table("supplier")
 
     # Perform LEFT ANTI JOIN
-    result = nation.join(supplier, nation["nationkey"] == supplier["suppkey"], "left_anti")
+    result = nation.join(
+        supplier, nation["nationkey"] == supplier["suppkey"], "left_anti"
+    )
 
     # Select columns from nation table
-    result = result.select(nation["nationkey"], nation["name"], nation["regionkey"], nation["comment"])
+    result = result.select(
+        nation["nationkey"],
+        nation["name"],
+        nation["regionkey"],
+        nation["comment"],
+    )
 
     # Show the result
     result.show()
@@ -211,7 +218,6 @@ def run_code(spark):
         .select("o1.custkey")
     )
     exercise_result.show()
-
 
 
 if __name__ == '__main__':

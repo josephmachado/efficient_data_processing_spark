@@ -75,10 +75,6 @@ class ClickstreamBronzeETL(TableETL):
 
         return etl_dataset
 
-    
-        
-        
-
     def load(self, data: ETLDataSet) -> None:
         clickstream_data = data.curr_data
 

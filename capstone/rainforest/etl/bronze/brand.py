@@ -77,10 +77,6 @@ class BrandBronzeETL(TableETL):
 
         return etl_dataset
 
-    
-        
-        
-
     def load(self, data: ETLDataSet) -> None:
         brand_data = data.curr_data
 

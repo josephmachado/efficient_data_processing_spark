@@ -106,10 +106,6 @@ class WideOrderItemsGoldETL(TableETL):
 
         return etl_dataset
 
-    
-        
-        
-
     def load(self, data: ETLDataSet) -> None:
         wide_order_items_data = data.curr_data
 

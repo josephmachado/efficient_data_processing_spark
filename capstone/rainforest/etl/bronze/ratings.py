@@ -76,10 +76,6 @@ class RatingsBronzeETL(TableETL):
 
         return etl_dataset
 
-    
-        
-        
-
     def load(self, data: ETLDataSet) -> None:
         ratings_data = data.curr_data
 

@@ -78,10 +78,6 @@ class FactOrdersSilverETL(TableETL):
 
         return etl_dataset
 
-    
-        
-        
-
     def load(self, data: ETLDataSet) -> None:
         order_data = data.curr_data
 

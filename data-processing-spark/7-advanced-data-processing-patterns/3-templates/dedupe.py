@@ -1,5 +1,4 @@
-from pyspark.sql import SparkSession, Window
-from pyspark.sql.functions import col, row_number
+from pyspark.sql import SparkSession
 
 
 def run_code(spark):
@@ -15,8 +14,9 @@ def run_code(spark):
     deduped_orders = duplicated_orders.dropDuplicates(['orderkey'])
 
     print(
-        f"Count of ranked orders with row number is {deduped_orders.count()} and"
-        f" original count of orders table is {orders.count()}"
+        "Count of ranked orders with row number is"
+        f" {deduped_orders.count()} and original count of orders table is"
+        f" {orders.count()}"
     )
 
 

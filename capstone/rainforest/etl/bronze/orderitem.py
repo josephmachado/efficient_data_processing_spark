@@ -75,10 +75,6 @@ class OrderItemBronzeETL(TableETL):
 
         return etl_dataset
 
-    
-        
-        
-
     def load(self, data: ETLDataSet) -> None:
         order_item_data = data.curr_data
 

@@ -77,10 +77,6 @@ class SellerProductBronzeETL(TableETL):
 
         return etl_dataset
 
-    
-        
-        
-
     def load(self, data: ETLDataSet) -> None:
         seller_product_data = data.curr_data
 

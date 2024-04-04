@@ -1,5 +1,6 @@
-from pyspark.sql import SparkSession
 import pprint
+
+from pyspark.sql import SparkSession
 
 
 def run_code(spark):
@@ -14,6 +15,7 @@ def run_code(spark):
     pp = pprint.PrettyPrinter(indent=4)
     pp.pprint(dict(conf.getAll()))
 
+
 if __name__ == '__main__':
     spark = (
         SparkSession.builder.appName("efficient-data-processing-spark")
@@ -22,4 +24,3 @@ if __name__ == '__main__':
     )
     run_code(spark=spark)
     spark.stop
-

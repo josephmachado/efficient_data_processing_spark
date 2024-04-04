@@ -1,8 +1,6 @@
-import os
 from datetime import datetime
 from typing import Dict, List, Optional, Type
 
-import great_expectations as gx
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, lit
 from rainforest.utils.base_table import ETLDataSet, TableETL
