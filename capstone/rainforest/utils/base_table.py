@@ -106,7 +106,7 @@ class TableETL(ABC):
                 f"The {self.name} dataset did not pass validation, please"
                 " check the metadata db for more information"
             )
-        if self.load_data:
+        if not self.load_data:
             self.load(transformed_data)
 
     @abstractmethod

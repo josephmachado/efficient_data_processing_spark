@@ -93,7 +93,7 @@ class SellerBronzeETL(TableETL):
                 partition_keys=self.partition_keys,
             )
 
-        if self.load_data:
+        if not self.load_data:
             return ETLDataSet(
                 name=self.name,
                 curr_data=self.curr_data,

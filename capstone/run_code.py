@@ -12,7 +12,9 @@ def run_code(spark):
     print("=================================")
     print("Daily Category Report")
     print("=================================")
-    daily_cat_metrics = DailyCategoryMetricsGoldETL(spark=spark)
+    daily_cat_metrics = DailyCategoryMetricsGoldETL(
+        spark=spark, load_data=False
+    )
     daily_cat_metrics.run()
     create_daily_category_report_view(daily_cat_metrics.read().curr_data)
     spark.sql("select * from global_temp.daily_category_report").show()
@@ -20,7 +22,9 @@ def run_code(spark):
     print("=================================")
     print("Daily Order Report")
     print("=================================")
-    gold_daily_order_metrics = DailyOrderMetricsGoldETL(spark=spark)
+    gold_daily_order_metrics = DailyOrderMetricsGoldETL(
+        spark=spark, load_data=False
+    )
     gold_daily_order_metrics.run()
     create_daily_order_report_view(gold_daily_order_metrics.read().curr_data)
     spark.sql("select * from global_temp.daily_order_report").show()

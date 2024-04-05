@@ -47,7 +47,11 @@ class WideOrderItemsGoldETL(TableETL):
     def extract_upstream(self) -> List[ETLDataSet]:
         upstream_etl_datasets = []
         for TableETLClass in self.upstream_table_names:
-            t1 = TableETLClass(spark=self.spark)
+            t1 = TableETLClass(
+                spark=self.spark,
+                run_upstream=self.run_upstream,
+                load_data=self.load_data,
+            )
             if self.run_upstream:
                 t1.run()
             upstream_etl_datasets.append(t1.read())
@@ -127,7 +131,7 @@ class WideOrderItemsGoldETL(TableETL):
             col('etl_inserted'),
         ]
 
-        if self.load_data:
+        if not self.load_data:
             return ETLDataSet(
                 name=self.name,
                 curr_data=self.curr_data.select(selected_columns),

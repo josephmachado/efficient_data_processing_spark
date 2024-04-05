@@ -83,7 +83,7 @@ class BrandBronzeETL(TableETL):
     def read(
         self, partition_values: Optional[Dict[str, str]] = None
     ) -> ETLDataSet:
-        if self.load_data:
+        if not self.load_data:
             return ETLDataSet(
                 name=self.name,
                 curr_data=self.curr_data,
