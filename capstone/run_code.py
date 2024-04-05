@@ -13,7 +13,7 @@ def run_code(spark):
     print("Daily Category Report")
     print("=================================")
     daily_cat_metrics = DailyCategoryMetricsGoldETL(
-        spark=spark, load_data=False
+        spark=spark
     )
     daily_cat_metrics.run()
     create_daily_category_report_view(daily_cat_metrics.read().curr_data)
