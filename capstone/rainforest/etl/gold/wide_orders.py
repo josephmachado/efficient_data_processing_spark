@@ -23,6 +23,7 @@ class WideOrdersGoldETL(TableETL):
         database: str = "rainforest",
         partition_keys: List[str] = ["etl_inserted"],
         run_upstream: bool = True,
+        load_data: bool = True,
     ) -> None:
         super().__init__(
             spark,
@@ -34,6 +35,7 @@ class WideOrdersGoldETL(TableETL):
             database,
             partition_keys,
             run_upstream,
+            load_data,
         )
 
     def extract_upstream(self) -> List[ETLDataSet]:
@@ -78,30 +80,12 @@ class WideOrdersGoldETL(TableETL):
             partition_keys=self.partition_keys,
         )
 
+        self.curr_data = etl_dataset.curr_data
         return etl_dataset
 
     def read(
         self, partition_values: Optional[Dict[str, str]] = None
     ) -> ETLDataSet:
-        if partition_values:
-            partition_filter = " AND ".join(
-                [f"{k} = '{v}'" for k, v in partition_values.items()]
-            )
-        else:
-            latest_partition = (
-                self.spark.read.format(self.data_format)
-                .load(self.storage_path)
-                .selectExpr("max(etl_inserted)")
-                .collect()[0][0]
-            )
-            partition_filter = f"etl_inserted = '{latest_partition}'"
-        # Read the transformed data from the Delta Lake table
-        wide_orders_data = (
-            self.spark.read.format(self.data_format)
-            .load(self.storage_path)
-            .filter(partition_filter)
-        )
-
         # Select the desired columns
         selected_columns = [
             col('order_id'),
@@ -126,6 +110,37 @@ class WideOrdersGoldETL(TableETL):
             col('etl_inserted'),
         ]
 
+        if self.load_data:
+            return ETLDataSet(
+            name=self.name,
+            curr_data=self.curr_data.select(selected_columns),
+            primary_keys=self.primary_keys,
+            storage_path=self.storage_path,
+            data_format=self.data_format,
+            database=self.database,
+            partition_keys=self.partition_keys,
+        )
+
+        elif partition_values:
+            partition_filter = " AND ".join(
+                [f"{k} = '{v}'" for k, v in partition_values.items()]
+            )
+        else:
+            latest_partition = (
+                self.spark.read.format(self.data_format)
+                .load(self.storage_path)
+                .selectExpr("max(etl_inserted)")
+                .collect()[0][0]
+            )
+            partition_filter = f"etl_inserted = '{latest_partition}'"
+        # Read the transformed data from the Delta Lake table
+        wide_orders_data = (
+            self.spark.read.format(self.data_format)
+            .load(self.storage_path)
+            .filter(partition_filter)
+        )
+
+        
         wide_orders_data = wide_orders_data.select(selected_columns)
 
         # Create an ETLDataSet instance

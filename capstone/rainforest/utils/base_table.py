@@ -10,6 +10,10 @@ import great_expectations as gx
 from pyspark.sql import DataFrame
 
 
+class InValidDataException(Exception):
+    pass
+
+
 @dataclass
 class ETLDataSet:
     name: str
@@ -34,6 +38,7 @@ class TableETL(ABC):
         database: str,
         partition_keys: List[str],
         run_upstream: bool = True,
+        load_data: bool = True,
     ) -> None:
         self.spark = spark
         self.upstream_table_names = upstream_table_names
@@ -44,6 +49,7 @@ class TableETL(ABC):
         self.database = database
         self.partition_keys = partition_keys
         self.run_upstream = run_upstream
+        self.load_data = load_data
 
     @abstractmethod
     def extract_upstream(self) -> List[ETLDataSet]:
@@ -95,8 +101,13 @@ class TableETL(ABC):
 
     def run(self) -> None:
         transformed_data = self.transform_upstream(self.extract_upstream())
-        self.validate(transformed_data)
-        self.load(transformed_data)
+        if not self.validate(transformed_data):
+            raise InValidDataException(
+                f"The {self.name} dataset did not pass validation, please"
+                " check the metadata db for more information"
+            )
+        if self.load_data:
+            self.load(transformed_data)
 
     @abstractmethod
     def read(
