@@ -129,14 +129,14 @@ class DimBuyerSilverETL(TableETL):
         ]
         if self.load_data:
             return ETLDataSet(
-            name=self.name,
-            curr_data=self.curr_data.select(selected_columns),
-            primary_keys=self.primary_keys,
-            storage_path=self.storage_path,
-            data_format=self.data_format,
-            database=self.database,
-            partition_keys=self.partition_keys,
-        )
+                name=self.name,
+                curr_data=self.curr_data.select(selected_columns),
+                primary_keys=self.primary_keys,
+                storage_path=self.storage_path,
+                data_format=self.data_format,
+                database=self.database,
+                partition_keys=self.partition_keys,
+            )
 
         elif partition_values:
             partition_filter = " AND ".join(
@@ -156,8 +156,6 @@ class DimBuyerSilverETL(TableETL):
             .load(self.storage_path)
             .filter(partition_filter)
         )
-
-        
 
         dim_buyer_data = dim_buyer_data.select(selected_columns)
 
