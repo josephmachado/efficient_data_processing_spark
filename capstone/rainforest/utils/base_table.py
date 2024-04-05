@@ -85,9 +85,13 @@ class TableETL(ABC):
         else:
             return True
 
-    @abstractmethod
     def load(self, data: ETLDataSet) -> None:
-        pass
+        # Write the transformed data to the Delta Lake table
+        data.curr_data.write.option("mergeSchema", "true").format(
+            data.data_format
+        ).mode("overwrite").partitionBy(data.partition_keys).save(
+            data.storage_path
+        )
 
     def run(self) -> None:
         transformed_data = self.transform_upstream(self.extract_upstream())

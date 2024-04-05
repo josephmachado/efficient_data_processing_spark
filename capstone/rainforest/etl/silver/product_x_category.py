@@ -67,16 +67,6 @@ class ProductCategorySilverETL(TableETL):
 
         return etl_dataset
 
-    def load(self, data: ETLDataSet) -> None:
-        product_category_data = data.curr_data
-
-        # Write the transformed data to the Delta Lake table
-        product_category_data.write.option("mergeSchema", "true").format(
-            data.data_format
-        ).mode("overwrite").partitionBy(data.partition_keys).save(
-            data.storage_path
-        )
-
     def read(
         self, partition_values: Optional[Dict[str, str]] = None
     ) -> ETLDataSet:

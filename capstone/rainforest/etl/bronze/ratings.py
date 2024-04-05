@@ -76,14 +76,6 @@ class RatingsBronzeETL(TableETL):
 
         return etl_dataset
 
-    def load(self, data: ETLDataSet) -> None:
-        ratings_data = data.curr_data
-
-        # Write the ratings data to the Delta Lake table
-        ratings_data.write.format(data.data_format).mode(
-            "overwrite"
-        ).partitionBy(data.partition_keys).save(data.storage_path)
-
     def read(
         self, partition_values: Optional[Dict[str, str]] = None
     ) -> ETLDataSet:
