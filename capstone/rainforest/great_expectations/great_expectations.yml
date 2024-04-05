@@ -66,15 +66,10 @@ fluent_datasources:
       orders:
         type: dataframe
         batch_metadata: {}
-      customer:
+      daily_order_metrics:
         type: dataframe
         batch_metadata: {}
       fct_orders:
         type: dataframe
         batch_metadata: {}
-      dim_customer:
-        type: dataframe
-        batch_metadata: {}
-      sales_mart:
-        type: dataframe
-        batch_metadata: {}
+
