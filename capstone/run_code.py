@@ -12,9 +12,7 @@ def run_code(spark):
     print("=================================")
     print("Daily Category Report")
     print("=================================")
-    daily_cat_metrics = DailyCategoryMetricsGoldETL(
-        spark=spark
-    )
+    daily_cat_metrics = DailyCategoryMetricsGoldETL(spark=spark)
     daily_cat_metrics.run()
     create_daily_category_report_view(daily_cat_metrics.read().curr_data)
     spark.sql("select * from global_temp.daily_category_report").show()
