@@ -12,7 +12,7 @@ class TestCategoryBronzeETL:
         assert category_etl_dataset[0].name == "category"
 
     def test_transform_upstream(self, spark):
-        # Create a sample DataFrame to simulate upstream dataset for category data
+        # Create a sample DataFrame
         sample_data = [
             (1, "Electronics", "2022-01-01", "Alice", "2022-01-01"),
             (2, "Clothing", "2022-01-02", "Bob", "2022-01-02"),
@@ -41,7 +41,9 @@ class TestCategoryBronzeETL:
         )
 
         # Apply transformation
-        transformed_dataset = category_tbl.transform_upstream([upstream_dataset])
+        transformed_dataset = category_tbl.transform_upstream(
+            [upstream_dataset]
+        )
 
         # Assert the 'etl_inserted' column is added to the transformed data
         assert 'etl_inserted' in transformed_dataset.curr_data.columns
@@ -50,6 +52,7 @@ class TestCategoryBronzeETL:
         expected_schema = set(schema + ["etl_inserted"])
         assert set(transformed_dataset.curr_data.columns) == expected_schema
 
-        # Compare the transformed dataset with the original upstream DataFrame (minus the 'etl_inserted' column)
+        # Compare the transformed dataset with the original
+        # upstream DataFrame (minus the 'etl_inserted' column)
         transformed_df = transformed_dataset.curr_data.select(schema)
         assert transformed_df.collect() == upstream_df.collect()

@@ -1,6 +1,7 @@
 from rainforest.etl.bronze.manufacturer import ManufacturerBronzeETL
 from rainforest.utils.base_table import ETLDataSet
 
+
 class TestManufacturerBronzeETL:
     def test_extract_upstream(self, spark):
         manufacturer_tbl = ManufacturerBronzeETL(spark=spark)
@@ -10,8 +11,22 @@ class TestManufacturerBronzeETL:
     def test_transform_upstream(self, spark):
         # Create a sample DataFrame to be used as upstream dataset
         sample_data = [
-            (1, "Manufacturer A", "Type 1", "2022-01-01", "Updater 1", "2022-01-01"),
-            (2, "Manufacturer B", "Type 2", "2022-01-02", "Updater 2", "2022-01-02"),
+            (
+                1,
+                "Manufacturer A",
+                "Type 1",
+                "2022-01-01",
+                "Updater 1",
+                "2022-01-01",
+            ),
+            (
+                2,
+                "Manufacturer B",
+                "Type 2",
+                "2022-01-02",
+                "Updater 2",
+                "2022-01-02",
+            ),
         ]
         schema = [
             "manufacturer_id",
@@ -37,7 +52,9 @@ class TestManufacturerBronzeETL:
         )
 
         # Apply transformation
-        transformed_dataset = manufacturer_tbl.transform_upstream([upstream_dataset])
+        transformed_dataset = manufacturer_tbl.transform_upstream(
+            [upstream_dataset]
+        )
 
         # Check if 'etl_inserted' column is added
         assert 'etl_inserted' in transformed_dataset.curr_data.columns

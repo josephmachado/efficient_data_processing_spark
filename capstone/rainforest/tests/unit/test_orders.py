@@ -1,6 +1,7 @@
 from rainforest.etl.bronze.orders import OrdersBronzeETL
 from rainforest.utils.base_table import ETLDataSet
 
+
 class TestOrdersBronzeETL:
     def test_extract_upstream(self, spark):
         orders_tbl = OrdersBronzeETL(spark=spark)
@@ -46,6 +47,9 @@ class TestOrdersBronzeETL:
         assert set(transformed_dataset.curr_data.columns) == expected_schema
 
         # Check if transformed dataset and upstream DataFrame are the same
-        # Before comparison, remove 'etl_inserted' as it's a timestamp and won't match exactly
-        transformed_df = transformed_dataset.curr_data.drop("etl_inserted").select(schema)
+        # Before comparison, remove 'etl_inserted' as it's a timestamp
+        # and won't match exactly
+        transformed_df = transformed_dataset.curr_data.drop(
+            "etl_inserted"
+        ).select(schema)
         assert transformed_df.collect() == upstream_df.collect()

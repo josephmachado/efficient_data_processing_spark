@@ -1,6 +1,7 @@
 from rainforest.etl.bronze.seller import SellerBronzeETL
 from rainforest.utils.base_table import ETLDataSet
 
+
 class TestSellerBronzeETL:
     def test_extract_upstream(self, spark):
         seller_tbl = SellerBronzeETL(spark=spark)
@@ -9,8 +10,22 @@ class TestSellerBronzeETL:
 
     def test_transform_upstream(self, spark):
         sample_data = [
-            (1, "user_1", "2022-01-01", "2022-01-01", "Updater A", "2022-01-01"),
-            (2, "user_2", "2022-01-02", "2022-01-02", "Updater B", "2022-01-02"),
+            (
+                1,
+                "user_1",
+                "2022-01-01",
+                "2022-01-01",
+                "Updater A",
+                "2022-01-01",
+            ),
+            (
+                2,
+                "user_2",
+                "2022-01-02",
+                "2022-01-02",
+                "Updater B",
+                "2022-01-02",
+            ),
         ]
         schema = [
             "seller_id",
@@ -41,5 +56,7 @@ class TestSellerBronzeETL:
         expected_schema = set(schema + ["etl_inserted"])
         assert set(transformed_dataset.curr_data.columns) == expected_schema
 
-        transformed_df = transformed_dataset.curr_data.drop("etl_inserted").select(schema)
+        transformed_df = transformed_dataset.curr_data.drop(
+            "etl_inserted"
+        ).select(schema)
         assert transformed_df.collect() == upstream_df.collect()

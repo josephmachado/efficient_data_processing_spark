@@ -1,6 +1,7 @@
 from rainforest.etl.bronze.sellerproduct import SellerProductBronzeETL
 from rainforest.utils.base_table import ETLDataSet
 
+
 class TestSellerProductBronzeETL:
     def test_extract_upstream(self, spark):
         seller_product_tbl = SellerProductBronzeETL(spark=spark)
@@ -33,12 +34,16 @@ class TestSellerProductBronzeETL:
             partition_keys=seller_product_tbl.partition_keys,
         )
 
-        transformed_dataset = seller_product_tbl.transform_upstream([upstream_dataset])
+        transformed_dataset = seller_product_tbl.transform_upstream(
+            [upstream_dataset]
+        )
 
         assert 'etl_inserted' in transformed_dataset.curr_data.columns
 
         expected_schema = set(schema + ["etl_inserted"])
         assert set(transformed_dataset.curr_data.columns) == expected_schema
 
-        transformed_df = transformed_dataset.curr_data.drop("etl_inserted").select(schema)
+        transformed_df = transformed_dataset.curr_data.drop(
+            "etl_inserted"
+        ).select(schema)
         assert transformed_df.collect() == upstream_df.collect()

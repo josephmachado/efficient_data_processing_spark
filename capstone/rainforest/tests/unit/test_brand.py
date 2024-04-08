@@ -51,6 +51,7 @@ class TestBrandBronzeETL:
         expected_schema = set(schema + ["etl_inserted"])
         assert set(transformed_dataset.curr_data.columns) == expected_schema
 
-        # Check if the transformed dataset and the original upstream DataFrame match (minus the 'etl_inserted' column)
+        # Check if the transformed dataset and the original
+        # upstream DataFrame match (minus the 'etl_inserted' column)
         transformed_df = transformed_dataset.curr_data.select(schema)
         assert transformed_df.collect() == upstream_df.collect()

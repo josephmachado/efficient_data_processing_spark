@@ -1,6 +1,7 @@
 from rainforest.etl.bronze.ratings import RatingsBronzeETL
 from rainforest.utils.base_table import ETLDataSet
 
+
 class TestRatingsBronzeETL:
     def test_extract_upstream(self, spark):
         ratings_tbl = RatingsBronzeETL(spark=spark)
@@ -37,7 +38,9 @@ class TestRatingsBronzeETL:
         )
 
         # Apply transformation
-        transformed_dataset = ratings_tbl.transform_upstream([upstream_dataset])
+        transformed_dataset = ratings_tbl.transform_upstream(
+            [upstream_dataset]
+        )
 
         # Check if 'etl_inserted' column is added
         assert 'etl_inserted' in transformed_dataset.curr_data.columns
@@ -47,6 +50,9 @@ class TestRatingsBronzeETL:
         assert set(transformed_dataset.curr_data.columns) == expected_schema
 
         # Check if transformed dataset and upstream DataFrame are the same
-        # Before comparison, remove 'etl_inserted' as it's a timestamp and won't match exactly
-        transformed_df = transformed_dataset.curr_data.drop("etl_inserted").select(schema)
+        # Before comparison, remove 'etl_inserted' as it's a timestamp
+        # and won't match exactly
+        transformed_df = transformed_dataset.curr_data.drop(
+            "etl_inserted"
+        ).select(schema)
         assert transformed_df.collect() == upstream_df.collect()

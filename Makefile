@@ -77,4 +77,4 @@ lint:
 	docker exec spark-master flake8 ./data-processing-spark
 	docker exec spark-master flake8 ./capstone
 
-ci: format type lint 
+ci: format type lint

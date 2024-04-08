@@ -12,10 +12,26 @@ class TestClickstreamBronzeETL:
         assert clickstream_etl_dataset[0].name == "clickstream"
 
     def test_transform_upstream(self, spark):
-        # Create a sample DataFrame to simulate upstream dataset for clickstream data
+        # Create a sample DataFrame
         sample_data = [
-            (1, "user_1", "view", "product_1", "order_1", "2022-01-01 12:00:00", "2022-01-01"),
-            (2, "user_2", "purchase", "product_2", "order_2", "2022-01-02 13:00:00", "2022-01-02"),
+            (
+                1,
+                "user_1",
+                "view",
+                "product_1",
+                "order_1",
+                "2022-01-01 12:00:00",
+                "2022-01-01",
+            ),
+            (
+                2,
+                "user_2",
+                "purchase",
+                "product_2",
+                "order_2",
+                "2022-01-02 13:00:00",
+                "2022-01-02",
+            ),
         ]
         schema = [
             "event_id",
@@ -43,7 +59,9 @@ class TestClickstreamBronzeETL:
         )
 
         # Apply transformation
-        transformed_dataset = clickstream_tbl.transform_upstream([upstream_dataset])
+        transformed_dataset = clickstream_tbl.transform_upstream(
+            [upstream_dataset]
+        )
 
         # Assert the 'etl_inserted' column is added to the transformed data
         assert 'etl_inserted' in transformed_dataset.curr_data.columns
@@ -52,6 +70,7 @@ class TestClickstreamBronzeETL:
         expected_schema = set(schema + ["etl_inserted"])
         assert set(transformed_dataset.curr_data.columns) == expected_schema
 
-        # Compare the transformed dataset with the original upstream DataFrame (minus the 'etl_inserted' column)
+        # Compare the transformed dataset with the
+        # original upstream DataFrame (minus the 'etl_inserted' column)
         transformed_df = transformed_dataset.curr_data.select(schema)
         assert transformed_df.collect() == upstream_df.collect()

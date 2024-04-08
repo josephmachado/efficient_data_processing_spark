@@ -14,8 +14,24 @@ class TestAppUserBronzeETL:
     def test_transform_upstream(self, spark):
         # Create a sample DataFrame to simulate upstream dataset for user data
         sample_data = [
-            (1, "username1", "email1@example.com", True, "2022-01-01", "Alice", "2022-01-01"),
-            (2, "username2", "email2@example.com", False, "2022-01-02", "Bob", "2022-01-02"),
+            (
+                1,
+                "username1",
+                "email1@example.com",
+                True,
+                "2022-01-01",
+                "Alice",
+                "2022-01-01",
+            ),
+            (
+                2,
+                "username2",
+                "email2@example.com",
+                False,
+                "2022-01-02",
+                "Bob",
+                "2022-01-02",
+            ),
         ]
         schema = [
             "user_id",
@@ -52,6 +68,7 @@ class TestAppUserBronzeETL:
         expected_schema = set(schema + ["etl_inserted"])
         assert set(transformed_dataset.curr_data.columns) == expected_schema
 
-        # Check if the transformed dataset and the original upstream DataFrame match (minus the 'etl_inserted' column)
+        # Check if the transformed dataset and the original
+        # upstream DataFrame match (minus the 'etl_inserted' column)
         transformed_df = transformed_dataset.curr_data.select(schema)
         assert transformed_df.collect() == upstream_df.collect()
