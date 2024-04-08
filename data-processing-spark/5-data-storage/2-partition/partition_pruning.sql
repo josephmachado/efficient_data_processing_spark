@@ -1,4 +1,4 @@
-USE minio;
+USE tpch;
 
 DROP TABLE IF EXISTS lineitem_w_encoding_w_partitioning;
 

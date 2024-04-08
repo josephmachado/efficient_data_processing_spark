@@ -1,8 +1,4 @@
-DROP SCHEMA IF EXISTS minio;
-
-CREATE SCHEMA minio;
-
-USE minio;
+USE tpch;
 
 DROP TABLE IF EXISTS lineitem_wo_encoding;
 
@@ -26,7 +22,7 @@ CREATE TABLE lineitem_wo_encoding (
 ) USING CSV LOCATION 's3a://tpch/lineitem_wo_encoding/';
 
 INSERT INTO
-    minio.lineitem_wo_encoding
+    lineitem_wo_encoding
 SELECT
     orderkey,
     partkey,
