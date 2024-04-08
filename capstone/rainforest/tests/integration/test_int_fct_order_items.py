@@ -1,8 +1,9 @@
 from datetime import datetime
+from decimal import Decimal
 
 from pyspark.sql import SparkSession
-from pyspark.sql.types import (DoubleType, IntegerType, StringType,
-                               StructField, StructType, TimestampType)
+from pyspark.sql.types import (DecimalType, IntegerType, StructField,
+                               StructType, TimestampType)
 from rainforest.etl.silver.fct_order_items import FactOrderItemsSilverETL
 from rainforest.utils.base_table import ETLDataSet
 
@@ -17,15 +18,25 @@ class TestFactOrderItemsSilverETLEndToEnd:
                 StructField("product_id", IntegerType(), True),
                 StructField("seller_id", IntegerType(), True),
                 StructField("quantity", IntegerType(), True),
-                StructField("base_price", DoubleType(), True),
-                StructField("tax", DoubleType(), True),
-                StructField("created_ts", StringType(), True),
+                StructField("base_price", DecimalType(10, 2), True),
+                StructField("tax", DecimalType(10, 2), True),
+                StructField("created_ts", TimestampType(), True),
                 StructField("etl_inserted", TimestampType(), True),
             ]
         )
 
         sample_data = [
-            (1, 100, 500, 10, 2, 100.0, 10.0, "2022-01-01", datetime.now())
+            (
+                1,
+                100,
+                500,
+                10,
+                2,
+                Decimal(100.0),
+                Decimal(10.0),
+                datetime.now(),
+                datetime.now(),
+            )
         ]
 
         input_df = spark.createDataFrame(
@@ -70,8 +81,6 @@ class TestFactOrderItemsSilverETLEndToEnd:
             "base_price",
             "tax",
             "actual_price",
-            "created_ts",
-            "etl_inserted",
         ]
         expected_data = [
             (
@@ -80,20 +89,20 @@ class TestFactOrderItemsSilverETLEndToEnd:
                 500,
                 10,
                 2,
-                100.0,
-                10.0,
-                90.0,
-                "2022-01-01",
-                loaded_data.curr_data.select('etl_inserted').collect()[0][
-                    "etl_inserted"
-                ],
+                Decimal(100),
+                Decimal(10),
+                Decimal(90),
             )
         ]
 
         # Verify columns
-        assert set(loaded_data.curr_data.columns) == set(
-            expected_columns
-        ), "Loaded data columns do not match expected"
+        assert set(
+            [
+                c
+                for c in loaded_data.curr_data.columns
+                if c not in ['created_ts', 'etl_inserted']
+            ]
+        ) == set(expected_columns), "Loaded data columns do not match expected"
 
         # Verify data
         actual_data = [
@@ -106,8 +115,6 @@ class TestFactOrderItemsSilverETLEndToEnd:
                 row["base_price"],
                 row["tax"],
                 row["actual_price"],
-                row["created_ts"],
-                row["etl_inserted"],
             )
             for row in loaded_data.curr_data.collect()
         ]

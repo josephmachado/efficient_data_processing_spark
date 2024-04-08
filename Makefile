@@ -64,7 +64,7 @@ rainforest:
 ## Testing, Linting, Type checks and Formatting
 
 pytest:
-	docker exec -ti spark-master bash -c 'export PYTHONPATH=/opt/spark/work-dir/capstone && python3 -m pytest --log-cli-level info -p no:warnings -v ./capstone/rainforest/tests'
+	docker exec spark-master bash -c 'export PYTHONPATH=/opt/spark/work-dir/capstone && python3 -m pytest --log-cli-level info -p no:warnings -v ./capstone/rainforest/tests'
 
 format:
 	docker exec spark-master black -S --line-length 79 --preview ./capstone ./data-processing-spark
