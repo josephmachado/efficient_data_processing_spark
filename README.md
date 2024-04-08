@@ -34,9 +34,9 @@ This is how you run pyspark exercise files:
 
 You can see the commands in <u>[this Makefile](https://github.com/josephmachado/efficient_data_processing_spark/blob/main/Makefile)</u>. If your terminal does not support **make** commands, please use the commands in <u>[the Makefile](https://github.com/josephmachado/efficient_data_processing_spark/blob/main/Makefile)</u> directly. All the commands in this book assume that you have the docker containers running.
 
-## Infrastructure Diagram
+## Infrastructure 
 
-We have 4 major services that run together, they are
+We have three major services that run together, they are
 
 1. **Postgres database**: We use a postgres data base to simulate an upstream application database for our rainforest capstone project.
 2. **Spark cluster**: We create a spark cluster with a master and 2 workers which is where the data is processed. The spark cluster also includes a history server, which displays the logs and resource utilization (Spark UI) for completed/failed spark applications.
