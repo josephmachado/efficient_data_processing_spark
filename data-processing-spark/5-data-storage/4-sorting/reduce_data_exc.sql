@@ -1,3 +1,4 @@
+USE tpch;
 
 DROP TABLE IF EXISTS lineitem_w_sorting;
 
