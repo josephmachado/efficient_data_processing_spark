@@ -3,10 +3,13 @@
 up:
 	docker compose up --build -d --scale spark-worker=2
 
+rm-logs:
+	docker volume rm efficient_data_processing_spark_tpch-data efficient_data_processing_spark_spark-logs
+
 down:
 	docker compose down
 
-restart: down up
+restart: down rm-logs up
 
 sh:
 	docker exec -ti spark-master bash
