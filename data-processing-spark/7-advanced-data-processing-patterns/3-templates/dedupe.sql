@@ -5,7 +5,7 @@ WITH duplicated_orders AS (
         *
     FROM
         orders
-    UNION
+    UNION ALL
     SELECT
         *
     FROM
@@ -14,7 +14,7 @@ WITH duplicated_orders AS (
 ranked_orders AS (
     SELECT
         *,
-        row_number() over(PARTITION by orderkey) AS rn
+        row_number() over(PARTITION by orderkey ORDER BY ORDERKEY) AS rn
     FROM
         orders
 )
