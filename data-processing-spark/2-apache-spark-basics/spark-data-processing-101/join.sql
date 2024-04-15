@@ -12,7 +12,7 @@ FROM
 LIMIT
     10;
 
--- 198277, 198277
+-- 247650, 247650
 SELECT
     COUNT(o.orderkey) AS order_rows_count,
     COUNT(l.orderkey) AS lineitem_rows_count
@@ -37,7 +37,7 @@ FROM
 LIMIT
     10;
 
--- 1512555, 198277
+-- 1519332, 247650
 SELECT
     COUNT(o.orderkey) AS order_rows_count,
     COUNT(l.orderkey) AS lineitem_rows_count
@@ -61,7 +61,7 @@ FROM
 LIMIT
     10;
 
--- 198277,  6001215
+-- 247650, 6001215
 SELECT
     COUNT(o.orderkey) AS order_rows_count,
     COUNT(l.orderkey) AS lineitem_rows_count
