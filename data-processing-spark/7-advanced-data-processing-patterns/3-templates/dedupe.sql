@@ -1,4 +1,4 @@
-USE tpch.tiny;
+USE tpch;
 
 WITH duplicated_orders AS (
     SELECT
