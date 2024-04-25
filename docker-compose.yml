@@ -12,6 +12,7 @@ services:
       - "4040:4040"
       - "9090:8080"
       - "7077:7077"
+      - "3000:3000"
     volumes:
       - ./capstone:/opt/spark/work-dir/capstone
       - ./data-processing-spark:/opt/spark/work-dir/data-processing-spark

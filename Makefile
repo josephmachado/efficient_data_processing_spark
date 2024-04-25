@@ -17,7 +17,7 @@ sh:
 ## Data generation
 
 fake-datagen:
-	python3 capstone/upstream_datagen/datagen.py
+	docker exec spark-master bash -c "python3 /opt/spark/work-dir/capstone/upstream_datagen/datagen.py"
 
 datagen:
 	docker exec -ti spark-master bash -c 'cd tpch-dbgen && make && ./dbgen -s 1'
@@ -81,3 +81,8 @@ lint:
 	docker exec spark-master flake8 ./capstone
 
 ci: format type lint
+
+## Jupyter server
+
+notebook:
+	docker exec spark-master bash -c "jupyter notebook --ip=0.0.0.0 --port=3000 --allow-root"

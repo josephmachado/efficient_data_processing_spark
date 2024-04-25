@@ -1,4 +1,10 @@
 # Efficient Data Processing in Spark 
+- [Efficient Data Processing in Spark](#efficient-data-processing-in-spark)
+  - [Setup](#setup)
+    - [Create aliases for long commands with a Makefile](#create-aliases-for-long-commands-with-a-makefile)
+    - [Run a Jupyter notebook](#run-a-jupyter-notebook)
+  - [Infrastructure](#infrastructure)
+
 
 Repository for examples and exercises from the "Efficient Data Processing in Spark" course (under [data-processing-spark](./data-processing-spark/)). The capstone project is also present in this repository (under [capstone/rainforest](./capstone/rainforest/)).
 
@@ -16,23 +22,45 @@ All the commands shown below are to be run via the terminal (use the Ubuntu term
 ```bash
 git clone https://github.com/josephmachado/efficient_data_processing_spark.git
 cd efficient_data_processing_spark
+# Start docker containers and create data for exercises and capstone project
+make restart && make setup
 ```
+
+### Create aliases for long commands with a Makefile
 
 **Makefile** lets you define shortcuts for commands that you might want to run, E.g., in our <u>[Makefile](https://github.com/josephmachado/efficient_data_processing_spark/blob/main/Makefile)</u>, we set the alias `spark-sql` for the command that opens us a spark sql session.
 
 We have some helpful **make** commands for working with our systems. Shown below are the make commands and their definitions
 
-1. `make up`: Spin up the docker containers.
-2. `make spark-sql`: Open a spark sql session; Use exit to quit the cli. **This is where you will type your SQL queries**.
-3. `make setup`: Generates data and [loads them into tables](https://github.com/josephmachado/efficient_data_processing_spark/blob/main/containers/spark/setup.sql) and starts spark histroy server where we can see logs/Spark UI for already completed jobs.
-4. `make down`: Stop the docker containers.
-5. `make cr`: To run our pyspark code by pasting the relative path of exercise/example problems under [data-processing-spark](./data-processing-spark/) folder. See example image shown below.
-6. `make rainforest`: Runs our rainforest capstone project, the entry point for this code is [here](./capstone/run_code.py)
+1. `make restart`: Stops running docker containers(if any) and starts new containers for our data infra.
+2. `make setup`: Generates data and [loads them into tables](https://github.com/josephmachado/efficient_data_processing_spark/blob/main/containers/spark/setup.sql) and starts spark histroy server where we can see logs/Spark UI for already completed jobs.
+3. `make spark-sql`: Open a spark sql session; Use exit to quit the cli. **This is where you will type your SQL queries**.
+4. `make cr`: To run our pyspark code by pasting the relative path of exercise/example problems under [data-processing-spark](./data-processing-spark/) folder. See example image shown below.
+5. `make rainforest`: Runs our rainforest capstone project, the entry point for this code is [here](./capstone/run_code.py)
 
 This is how you run pyspark exercise files:
 ![make cr example](./assets/make_cr.gif)
 
 You can see the commands in <u>[this Makefile](https://github.com/josephmachado/efficient_data_processing_spark/blob/main/Makefile)</u>. If your terminal does not support **make** commands, please use the commands in <u>[the Makefile](https://github.com/josephmachado/efficient_data_processing_spark/blob/main/Makefile)</u> directly. All the commands in this book assume that you have the docker containers running.
+
+You can test and run the capstone project as:
+
+```bash
+make pytest # to run all test cases
+make ci # to run linting, formatting, and type checks
+make rainforest # to run our ETL and create the final reports
+```
+### Run a Jupyter notebook
+
+Use the following command to start a jupyter server:
+
+```bash
+make notebook
+```
+
+You will see a link displayed with the format http://127.0.0.1:3000/?token=your-token, click it to open the jupyter notebook on your browser. You can use [local jupyter notebook sample](./assets/sample_jupyter_notebook.ipynb) to get started.
+
+You can stop the jupyter server with ctrl + c.
 
 ## Infrastructure 
 

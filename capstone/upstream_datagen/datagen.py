@@ -9,7 +9,7 @@ conn = psycopg2.connect(
     dbname="upstreamdb",
     user="sdeuser",
     password="sdepassword",
-    host="localhost",
+    host="upstream",
     port="5432",
 )
 cur = conn.cursor()
