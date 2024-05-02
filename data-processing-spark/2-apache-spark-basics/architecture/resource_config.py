@@ -23,4 +23,4 @@ if __name__ == '__main__':
         .getOrCreate()
     )
     run_code(spark=spark)
-    spark.stop
+    spark.stop()

@@ -33,4 +33,4 @@ if __name__ == '__main__':
     # Set the log level
     spark.sparkContext.setLogLevel("ERROR")
     run_code(spark=spark)
-    spark.stop
+    spark.stop()

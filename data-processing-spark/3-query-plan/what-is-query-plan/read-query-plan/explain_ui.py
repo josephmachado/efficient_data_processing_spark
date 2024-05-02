@@ -27,4 +27,4 @@ if __name__ == '__main__':
     spark.sparkContext.setLogLevel("ERROR")
     spark.conf.set("spark.sql.adaptive.enabled", "false")
     run_code(spark=spark)
-    spark.stop
+    spark.stop()
