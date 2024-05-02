@@ -19,9 +19,9 @@ if __name__ == '__main__':
     spark = (
         SparkSession.builder.appName("Custom config")
         .config("spark.executor.memory", "2g") 
-        .config("spark.executor.cores", "3") 
+        .config("spark.executor.cores", "3") # total cores across all executors
         .config("spark.cores.max", "3") 
-        .config("spark.memory.fraction", "0.9")
+        .config("spark.memory.fraction", "0.9") # set aside 10% for user memory, rest for Spark data processing
         .enableHiveSupport()
         .getOrCreate()
     )
