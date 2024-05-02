@@ -49,4 +49,4 @@ def spark():
     ).getOrCreate()
 
     yield spark
-    spark.stop()()
+    spark.stop()
