@@ -16,6 +16,7 @@ def run_code(spark):
     ).show(10)
 
 if __name__ == '__main__':
+
     spark = (
         SparkSession.builder.appName("Custom config")
         .config("spark.executor.memory", "2g") 
@@ -30,12 +31,3 @@ if __name__ == '__main__':
     run_code(spark=spark)
     spark.stop()
 
-    spark_default = (
-        SparkSession.builder.appName("Default config")
-        .enableHiveSupport()
-        .getOrCreate()
-    )
-    # Set the log level
-    spark_default.sparkContext.setLogLevel("ERROR")
-    run_code(spark=spark_default)
-    spark_default.stop()
