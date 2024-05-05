@@ -60,7 +60,7 @@ services:
       UPSTREAM_DATABASE: upstreamdb
  
   minio:
-    image: 'minio/minio:RELEASE.2023-07-21T21-12-44Z'
+    image: 'minio/minio:latest'
     hostname: minio
     container_name: minio
     ports:
