@@ -21,7 +21,7 @@ In order to run the project you'll need to install the following:
 
 All the commands shown below are to be run via the terminal (use the Ubuntu terminal for WSL users). The `make` commands in this book should be run in the `efficient_data_processing_spark` folder. We will use docker to set up our containers. Clone and move into the lab repository, as shown below.
 
-**Note**: If you are using mac M1, please replace the "FROM deltaio/delta-docker:latest" in [data-processing-spark/1-lab-setup/containers/spark/Dockerfile](./data-processing-spark/1-lab-setup/containers/spark/Dockerfile) with "FROM deltaio/delta-docker:latest_arm64"
+**Note**: If you are using mac M1 or later, please replace the "FROM deltaio/delta-docker:latest" in [data-processing-spark/1-lab-setup/containers/spark/Dockerfile](./data-processing-spark/1-lab-setup/containers/spark/Dockerfile) with "FROM deltaio/delta-docker:latest_arm64"
 
 
 ```bash
