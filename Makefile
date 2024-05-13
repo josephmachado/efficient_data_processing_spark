@@ -32,13 +32,16 @@ upstream:
 
 ## Create tables
 
+create-buckets:
+	docker exec spark-master bash -c "python3 /opt/spark/work-dir/create_buckets.py"
+
 create-tables:
 	docker exec spark-master spark-sql --master spark://spark-master:7077 --deploy-mode client -f ./setup.sql
 
 count-tables:
 	docker exec spark-master spark-sql --master spark://spark-master:7077 --deploy-mode client -f ./count.sql
 
-setup: datagen fake-datagen create-tables 
+setup: datagen fake-datagen create-buckets create-tables 
 
 ## Spark UIs: master UI, Spark application UI & History Server UI
 

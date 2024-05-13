@@ -9,6 +9,7 @@ RUN pip install -r requirements.txt
 # Copy SQL DDL and DML to SPARK_HOME dir
 COPY ./setup.sql ./
 COPY ./count.sql ./
+COPY ./create_buckets.py ./
 
 # Copy tpch data generator into the container
 COPY ./tpch-dbgen ./tpch-dbgen/
