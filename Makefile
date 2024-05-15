@@ -9,7 +9,7 @@ docker-up:
 up: build docker-up
 
 rm-logs:
-	docker volume rm efficient_data_processing_spark_tpch-data efficient_data_processing_spark_spark-logs
+	docker volume rm -f efficient_data_processing_spark_tpch-data efficient_data_processing_spark_spark-logs
 
 down:
 	docker compose down
