@@ -1,10 +1,7 @@
-name: Test on macOS M1
+name: Interactive SSH Access
 
 on:
-  push:
-  pull_request:
   workflow_dispatch:
-
 
 jobs:
   setup-ssh:
@@ -30,19 +27,20 @@ jobs:
         run: sudo launchctl load -w /System/Library/LaunchDaemons/ssh.plist
 
       - name: Generate SSH key
-        run: |
-          ssh-keygen -t rsa -b 4096 -f ./id_rsa -N ""
-          cat ./id_rsa.pub >> ~/.ssh/authorized_keys
         id: ssh-key
+        run: |
+          ssh-keygen -t rsa -b 4096 -f $HOME/.ssh/id_rsa -N ""
+          cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
+          echo "Private key for SSH access:"
+          cat $HOME/.ssh/id_rsa
 
       - name: Display SSH connection info
         run: |
-          echo "Connect with the following command:"
-          echo "ssh -i ./id_rsa $(whoami)@$(hostname)"
-        env:
-          SSH_KEY: ${{ steps.ssh-key.outputs.ssh-key }}
+          echo "Use the following command to connect to the runner via SSH:"
+          echo "ssh -i $HOME/.ssh/id_rsa $(whoami)@$(hostname)"
 
       - name: Keep runner alive for 30 minutes
         run: |
           echo "Runner will stay alive for 30 minutes. Connect using SSH."
           sleep 1800
+
