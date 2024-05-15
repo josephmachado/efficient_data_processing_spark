@@ -1,9 +1,13 @@
 name: Test on macOS M1
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
 
 jobs:
-  build:
+  setup-ssh:
     runs-on: macos-12
 
     steps:
@@ -17,16 +21,28 @@ jobs:
         env:
           DISPLAY: :0
 
-      - name: Wait for Docker to start
+      - name: Install SSH server
         run: |
-          while ! docker info > /dev/null 2>&1; do
-            echo "Waiting for Docker to start..."
-            sleep 2
-          done
+          brew install openssh
+          sudo systemsetup -f -setremotelogin on
 
-      - name: Run Makefile commands
+      - name: Start SSH server
+        run: sudo launchctl load -w /System/Library/LaunchDaemons/ssh.plist
+
+      - name: Generate SSH key
         run: |
-          make restart
-          make setup
-          make count-tables
+          ssh-keygen -t rsa -b 4096 -f ./id_rsa -N ""
+          cat ./id_rsa.pub >> ~/.ssh/authorized_keys
+        id: ssh-key
 
+      - name: Display SSH connection info
+        run: |
+          echo "Connect with the following command:"
+          echo "ssh -i ./id_rsa $(whoami)@$(hostname)"
+        env:
+          SSH_KEY: ${{ steps.ssh-key.outputs.ssh-key }}
+
+      - name: Keep runner alive for 30 minutes
+        run: |
+          echo "Runner will stay alive for 30 minutes. Connect using SSH."
+          sleep 1800
