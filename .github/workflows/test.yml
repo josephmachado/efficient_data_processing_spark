@@ -1,0 +1,32 @@
+name: Test on macOS M1
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: macos-12
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker
+        run: |
+          brew install --cask docker
+          open /Applications/Docker.app
+        env:
+          DISPLAY: :0
+
+      - name: Wait for Docker to start
+        run: |
+          while ! docker info > /dev/null 2>&1; do
+            echo "Waiting for Docker to start..."
+            sleep 2
+          done
+
+      - name: Run Makefile commands
+        run: |
+          make restart
+          make setup
+          make count-tables
+
