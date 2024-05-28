@@ -1,3 +1,4 @@
+#!/bin/bash
 # parse dir 
 ENV_WORK_DIR=$(pwd)
 
