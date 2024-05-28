@@ -52,7 +52,8 @@
 				"visualstudioexptteam.vscodeintellicode",
 				"ms-azuretools.vscode-docker",
 				"redhat.vscode-yaml",
-				"esbenp.prettier-vscode"
+				"esbenp.prettier-vscode",
+				"vscode-icons-team.vscode-icons"
 			],
 			"settings": {
 				"terminal.integrated.env.osx": {
