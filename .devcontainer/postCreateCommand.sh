@@ -61,6 +61,9 @@ source source_env.sh
 print_section "CREATE VENV & INSTALL REQUIREMENTS"
 python3 -m venv --clear $VIRTUAL_ENV
 
+
+
+
 # # add virt env to PATH which allows the next part of script to install packages directly to venv
 # export PATH="$VIRTUAL_ENV/bin:$PATH"
 
@@ -73,3 +76,9 @@ pip install -r data-processing-spark/1-lab-setup/containers/spark/requirements.t
 ENV_WORK_DIR=$(pwd)
 curl -o $ENV_WORK_DIR/deactivate https://gist.githubusercontent.com/karrtikr/963469ba74c9b7632d2c43224ffa2f25/raw/deactivate
 echo "source $ENV_WORK_DIR/deactivate" >> ~/.zshrc
+
+# remember to add the following to gitignore 
+# .venv
+# node_modules
+# package-lock.json
+# package.json
