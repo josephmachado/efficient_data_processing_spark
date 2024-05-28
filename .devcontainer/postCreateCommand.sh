@@ -82,3 +82,10 @@ echo "source $ENV_WORK_DIR/deactivate" >> ~/.zshrc
 # node_modules
 # package-lock.json
 # package.json
+
+
+# optional : download code cli to then access dev container from a browser 
+curl -Lk 'https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64' --output vscode_cli.tar.gz
+tar -xf vscode_cli.tar.gz
+
+# usage: ./code tunnel
