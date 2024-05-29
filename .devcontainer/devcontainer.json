@@ -57,13 +57,13 @@
 			],
 			"settings": {
 				"terminal.integrated.env.osx": {
-					"PYTHONPATH": "${env:PYTHONPATH}:${workspaceFolder}/data-processing-spark"
+					"PYTHONPATH": "${env:PYTHONPATH}"
 				},
 				"terminal.integrated.env.linux": {
-					"PYTHONPATH": "${env:PYTHONPATH}:${workspaceFolder}/data-processing-spark"
+					"PYTHONPATH": "${env:PYTHONPATH}"
 				},
 				"terminal.integrated.env.windows": {
-					"PYTHONPATH": "${env:PYTHONPATH};${workspaceFolder}/data-processing-spark"
+					"PYTHONPATH": "${env:PYTHONPATH}"
 				},
 				"python.defaultInterpreterPath": ".venv/bin/python",
 				"python.venvFolders": [
