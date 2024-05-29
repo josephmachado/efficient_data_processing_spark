@@ -69,7 +69,7 @@ python3 -m venv --clear $VIRTUAL_ENV
 
 # # install reqs. each lines is a separate process hence neeeds a source .venv in front
 source .venv/bin/activate && \
-pip install -r data-processing-spark/1-lab-setup/containers/spark/requirements.txt && \
+pip install -r data-processing-spark/1-lab-setup/containers/spark/requirements.txt
 
 
 # fix for deactivate script : https://github.com/microsoft/vscode-python/wiki/Fixing-%22deactivate%22-command-for-Virtual-Environments
