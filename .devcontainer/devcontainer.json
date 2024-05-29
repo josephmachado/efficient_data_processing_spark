@@ -1,0 +1,77 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/python
+{
+	"name": "Python 3",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "mcr.microsoft.com/devcontainers/python:1-3.9-bookworm",
+	"runArgs": [
+		"--name",
+		"spark-Learn"
+	],
+	"remoteUser": "root",
+	"postCreateCommand": "bash -i .devcontainer/postCreateCommand.sh",
+	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {
+			"moby": "false",
+			"azureDnsAutoDetection": "false",
+			"installDockerBuildx": "false",
+			"installDockerComposeSwitch": "false",
+			"version": "latest",
+			"dockerDashComposeVersion": "latest"
+		}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"bastienboutonnet.vscode-dbt",
+				"chrisdias.vscode-opennewinstance",
+				"cweijan.vscode-office",
+				"dvirtz.parquet-viewer",
+				"henriblancke.vscode-dbt-formatter",
+				"innoverio.vscode-dbt-power-user",
+				"mechatroner.rainbow-csv",
+				"mhutchie.git-graph",
+				"ms-python.debugpy",
+				"ms-python.python",
+				"ms-python.vscode-pylance",
+				"ms-toolsai.jupyter",
+				"ms-toolsai.jupyter-keymap",
+				"ms-toolsai.jupyter-renderers",
+				"ms-toolsai.vscode-jupyter-cell-tags",
+				"ms-toolsai.vscode-jupyter-slideshow",
+				"mtxr.sqltools",
+				"mtxr.sqltools-driver-pg",
+				"mtxr.sqltools-driver-sqlite",
+				"mutantdino.resourcemonitor",
+				"randomfractalsinc.duckdb-sql-tools",
+				"samuelcolvin.jinjahtml",
+				"sourcegraph.cody-ai",
+				"taoklerks.poor-mans-t-sql-formatter-vscode",
+				"uloco.theme-bluloco-dark",
+				"visualstudioexptteam.intellicode-api-usage-examples",
+				"visualstudioexptteam.vscodeintellicode",
+				"ms-azuretools.vscode-docker",
+				"redhat.vscode-yaml",
+				"esbenp.prettier-vscode",
+				"vscode-icons-team.vscode-icons"
+			],
+			"settings": {
+				"terminal.integrated.env.osx": {
+					"PYTHONPATH": "${env:PYTHONPATH}"
+				},
+				"terminal.integrated.env.linux": {
+					"PYTHONPATH": "${env:PYTHONPATH}"
+				},
+				"terminal.integrated.env.windows": {
+					"PYTHONPATH": "${env:PYTHONPATH}"
+				},
+				"python.defaultInterpreterPath": ".venv/bin/python",
+				"python.venvFolders": [
+					"${workspaceFolder}/.venv"
+				],
+				"python.envFile": "${workspaceFolder}/.env",
+				"python.terminal.activateEnvironment": true
+			}
+		}
+	}
+}

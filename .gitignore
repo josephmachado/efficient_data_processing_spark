@@ -6,3 +6,9 @@ derby.log
 *.pyc
 __pycache__/
 
+.venv
+node_modules
+package-lock.json
+package.json
+vscode_cli.tar.gz
+code
