@@ -64,6 +64,9 @@ spark-sql:
 
 ## Pyspark runner
 
+cq: 
+	@read -p "Enter .sql relative path:" sql_path; docker exec -ti spark-master spark-sql --master spark://spark-master:7077 $$sql_path
+
 cr: 
 	@read -p "Enter pyspark relative path:" pyspark_path; docker exec -ti spark-master spark-submit --master spark://spark-master:7077 $$pyspark_path
 
