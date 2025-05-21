@@ -67,9 +67,11 @@ class DimSellerSilverETL(TableETL):
         # Rename common columns in appuser_data to avoid conflicts
         appuser_data = appuser_data.selectExpr(
             *[
-                f"`{col}` as appuser_{col}"
-                if col in common_columns and col != "user_id"
-                else col
+                (
+                    f"`{col}` as appuser_{col}"
+                    if col in common_columns and col != "user_id"
+                    else col
+                )
                 for col in appuser_data.columns
             ]
         )
@@ -77,9 +79,11 @@ class DimSellerSilverETL(TableETL):
         # Rename common columns in seller_data to avoid conflicts
         seller_data = seller_data.selectExpr(
             *[
-                f"`{col}` as seller_{col}"
-                if col in common_columns and col != "user_id"
-                else col
+                (
+                    f"`{col}` as seller_{col}"
+                    if col in common_columns and col != "user_id"
+                    else col
+                )
                 for col in seller_data.columns
             ]
         )

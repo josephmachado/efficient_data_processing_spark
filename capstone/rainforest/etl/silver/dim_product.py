@@ -70,9 +70,11 @@ class DimProductSilverETL(TableETL):
         # Rename common columns in product_data to avoid conflicts
         product_data = product_data.selectExpr(
             *[
-                f"`{col}` as product_{col}"
-                if col in common_columns and col != "brand_id"
-                else col
+                (
+                    f"`{col}` as product_{col}"
+                    if col in common_columns and col != "brand_id"
+                    else col
+                )
                 for col in product_data.columns
             ]
         )
@@ -80,9 +82,11 @@ class DimProductSilverETL(TableETL):
         # Rename common columns in brand_data to avoid conflicts
         brand_data = brand_data.selectExpr(
             *[
-                f"`{col}` as brand_{col}"
-                if col in common_columns and col != "brand_id"
-                else col
+                (
+                    f"`{col}` as brand_{col}"
+                    if col in common_columns and col != "brand_id"
+                    else col
+                )
                 for col in brand_data.columns
             ]
         )
@@ -102,10 +106,12 @@ class DimProductSilverETL(TableETL):
         # Rename common columns in dim_product_data to avoid conflicts
         dim_product_data = dim_product_data.selectExpr(
             *[
-                f"`{col}` as product_{col}"
-                if col in common_columns
-                and col not in ["brand_id", "manufacturer_id"]
-                else col
+                (
+                    f"`{col}` as product_{col}"
+                    if col in common_columns
+                    and col not in ["brand_id", "manufacturer_id"]
+                    else col
+                )
                 for col in dim_product_data.columns
             ]
         )
@@ -113,9 +119,11 @@ class DimProductSilverETL(TableETL):
         # Rename common columns in manufacturer_data to avoid conflicts
         manufacturer_data = manufacturer_data.selectExpr(
             *[
-                f"`{col}` as manufacturer_{col}"
-                if col in common_columns and col != "manufacturer_id"
-                else col
+                (
+                    f"`{col}` as manufacturer_{col}"
+                    if col in common_columns and col != "manufacturer_id"
+                    else col
+                )
                 for col in manufacturer_data.columns
             ]
         )

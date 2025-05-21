@@ -19,7 +19,7 @@ def spark():
         .config("spark.dynamicAllocation.enabled", "false")
         .config("spark.ui.enabled", "false")
         .config("spark.ui.showConsoleProgress", "false")
-        .config("spark.default.parallelism", 6) # my laptop has 6 cores
+        .config("spark.default.parallelism", 6)  # my laptop has 6 cores
         .config("spark.executor.cores", "1")
         .config("spark.executor.instances", "1")
         .config("spark.sql.shuffle.partitions", "1")
